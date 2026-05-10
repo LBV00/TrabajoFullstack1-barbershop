@@ -1,0 +1,17 @@
+server:
+  port: 9093
+
+spring:
+  application:
+    name: producto-service
+  datasource:
+    url: jdbc:mysql://localhost:3306/db_barbershop_productos?createDatabaseIfNotExist=true
+    username: root
+    password: 
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.sql

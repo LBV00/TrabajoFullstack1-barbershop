@@ -1,0 +1,19 @@
+server:
+  port: 9095
+
+spring:
+  application:
+    name: resena-service
+  datasource:
+    url: jdbc:mysql://localhost:3306/db_barbershop_resenas?createDatabaseIfNotExist=true
+    username: root
+    password: 
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+# Ruta para consultar al user-service a través del Gateway
+api:
+  base-url: http://localhost:9090
+  user: /api/v1/users/%s/exists

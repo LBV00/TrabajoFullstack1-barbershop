@@ -1,0 +1,23 @@
+server:
+  port: 9092
+
+spring:
+  application:
+    name: reserva-service
+  datasource:
+    url: jdbc:mysql://localhost:3306/db_barbershop_reservas?createDatabaseIfNotExist=true
+    username: root
+    password: 
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.sql
+
+# Rutas para consultar por WebClient
+api:
+  base-url: http://localhost:9090
+  user: /api/v1/users/%s/exists
+  producto: /api/v1/productos/%s/exists
