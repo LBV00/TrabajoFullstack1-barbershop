@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/v1/resenas")
+@RequestMapping("/resenas")
 public class ResenaController {
 
     private final ResenaService resenaService;

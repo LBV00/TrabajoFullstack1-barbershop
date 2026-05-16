@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/v1/productos")
+@RequestMapping("/productos")
 public class ProductoController {
 
     private final ProductoService productoService;

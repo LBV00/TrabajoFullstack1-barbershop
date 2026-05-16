@@ -1,5 +1,5 @@
 server:
-  port: 9095
+  port: 7095
 
 spring:
   application:
@@ -15,5 +15,5 @@ spring:
 
 # Ruta para consultar al user-service a través del Gateway
 api:
-  base-url: http://localhost:9090
-  user: /api/v1/users/%s/exists
+  base-url: http://localhost:7090
+  user: /users/%s/exists

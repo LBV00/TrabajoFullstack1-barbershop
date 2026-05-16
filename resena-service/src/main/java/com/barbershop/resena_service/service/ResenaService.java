@@ -17,7 +17,7 @@ import java.util.Optional;
 @Transactional
 public class ResenaService {
 
-    // Inicializamos el Logger para cumplir con la rúbrica
+    // Inicializamos el Logger 
     private static final Logger log = LoggerFactory.getLogger(ResenaService.class);
 
     private final ResenaRepository resenaRepository;

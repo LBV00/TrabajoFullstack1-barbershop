@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/v1/pagos")
+@RequestMapping("/pagos")
 public class PagoController {
 
     private final PagoService pagoService;
