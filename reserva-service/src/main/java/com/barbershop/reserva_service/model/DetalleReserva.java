@@ -17,6 +17,9 @@ public class DetalleReserva {
     private Long id;
     @ManyToOne
     @JoinColumn(name = "reserva_id", nullable = false)
+    @JsonIgnore
+    @ToString.Exclude             
+    @EqualsAndHashCode.Exclude    
     private Reserva reserva;
     @Column(name = "id_producto", nullable = false)
     private Long idProducto;
