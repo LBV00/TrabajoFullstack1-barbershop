@@ -17,8 +17,6 @@ public class DetalleReserva {
     private Long id;
     @ManyToOne
     @JoinColumn(name = "reserva_id", nullable = false)
-    @JsonIgnore
-    @ToString.Exclude  // <--- Agrega esto para bloquear el bucle de memoria de Lombok
     private Reserva reserva;
     @Column(name = "id_producto", nullable = false)
     private Long idProducto;
