@@ -1,5 +1,5 @@
 server:
-  port: 9092
+  port: 7092
 
 spring:
   application:
@@ -18,6 +18,6 @@ spring:
 
 # Rutas para consultar por WebClient
 api:
-  base-url: http://localhost:9090
-  user: /api/v1/users/%s/exists
-  producto: /api/v1/productos/%s/exists
+  base-url: http://localhost:7090
+  user: /users/%s/exists
+  producto: /productos/%s/exists
