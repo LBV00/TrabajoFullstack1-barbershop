@@ -28,7 +28,7 @@ public class User {
     private String apellido;
 
     @Column(nullable = false, unique = true, length = 150)
-    private String email;
+    private String gmail;
 
     @Column(length = 20)
     private String telefono;

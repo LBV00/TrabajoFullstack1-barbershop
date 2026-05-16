@@ -26,9 +26,9 @@ public class UserDTO {
     @NotBlank(message = "El apellido es obligatorio")
     private String apellido;
     
-    @NotBlank(message = "El email es obligatorio")
+    @NotBlank(message = "El gmail es obligatorio")
     @Email(message = "Formato de correo inválido")
-    private String email;
+    private String gmail;
     
     private String telefono;
 
@@ -39,7 +39,7 @@ public class UserDTO {
                 .rut(user.getRut())
                 .nombre(user.getNombre())
                 .apellido(user.getApellido())
-                .email(user.getEmail())
+                .gmail(user.getGmail())
                 .telefono(user.getTelefono())
                 .build();
     }
@@ -51,7 +51,7 @@ public class UserDTO {
                 .rut(this.rut)
                 .nombre(this.nombre)
                 .apellido(this.apellido)
-                .email(this.email)
+                .gmail(this.gmail)
                 .telefono(this.telefono)
                 .build();
     }
