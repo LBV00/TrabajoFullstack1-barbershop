@@ -5,9 +5,9 @@ CREATE TABLE reservas (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     id_usuario BIGINT NOT NULL,
     fecha_reserva DATETIME NOT NULL,
-    total DOUBLE NOT NULL
+    total DOUBLE NOT NULL,
+    estado VARCHAR(50) NOT NULL 
 );
-
 CREATE TABLE detalle_reservas (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     reserva_id BIGINT NOT NULL,

@@ -7,8 +7,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 
-
-
 @Entity
 @Table(name = "reservas")
 @Data
@@ -25,7 +23,7 @@ public class Reserva {
     private LocalDateTime fechaReserva;
     @Column(nullable = false)
     private Double total;
-    @Column(length = 20)
+    @Column(nullable =false)
     private String estado;
 
     @OneToMany(mappedBy = "reserva", cascade = CascadeType.ALL, orphanRemoval = true)
