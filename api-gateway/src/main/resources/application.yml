@@ -10,26 +10,26 @@ spring:
         webflux:
           routes:
             - id: user-service
-              uri: http://localhost:9091
+              uri: http://localhost:7091
               predicates:
-                - Path=/api/v1/users/**
+                - Path=/users/**
 
             - id: reserva-service
-              uri: http://localhost:9092
+              uri: http://localhost:7092
               predicates:
-                - Path=/api/v1/reservas/**
+                - Path=/reservas/**
             
             - id: producto-service
-              uri: http://localhost:9093
+              uri: http://localhost:7093
               predicates:
-                - Path=/api/v1/productos/**
+                - Path=/productos/**
                 
             - id: pago-service
-              uri: http://localhost:9094
+              uri: http://localhost:7094
               predicates:
-                - Path=/api/v1/pagos/**
+                - Path=/pagos/**
 
             - id: resena-service
-              uri: http://localhost:9095
+              uri: http://localhost:7095
               predicates:
-                - Path=/api/v1/resenas/**
+                - Path=/resenas/**
