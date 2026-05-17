@@ -30,8 +30,8 @@ INSERT INTO reservas (id_usuario, fecha_reserva, total, estado) VALUES
 (8, '2026-05-23 16:45:00', 15000.0, 'CONFIRMADA'),
 (9, '2026-05-24 10:15:00', 28000.0, 'COMPLETADA'),
 (10, '2026-05-25 13:00:00', 35000.0, 'CONFIRMADA'),
-(11, '2026-05-26 15:00:00', 15000.0, 'PENDIENTE'),
-(12, '2026-05-27 17:30:00', 10000.0, 'COMPLETADA');
+(1, '2026-06-26 15:00:00', 15000.0, 'PENDIENTE'),
+(2, '2026-06-27 17:30:00', 10000.0, 'COMPLETADA');
 
 --changeset barbershop:4
 INSERT INTO detalle_reservas (reserva_id, id_producto, precio_unitario) VALUES
