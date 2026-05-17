@@ -21,10 +21,10 @@ CREATE TABLE detalle_reservas (
 --changeset barbershop:3
 INSERT INTO reservas (id_usuario, fecha_reserva, total, estado) VALUES
 (1, '2026-05-16 10:00:00', 15000.0, 'PENDIENTE'),
-(1, '2026-05-17 12:30:00', 25000.0, 'CONFIRMADA'),
-(2, '2026-05-18 15:00:00', 10000.0, 'COMPLETADA'),
-(3, '2026-05-19 18:00:00', 30000.0, 'CANCELADA'),
-(1, '2026-05-20 09:15:00', 12000.0, 'CONFIRMADA');
+(2, '2026-05-17 12:30:00', 25000.0, 'CONFIRMADA'),
+(3, '2026-05-18 15:00:00', 10000.0, 'COMPLETADA'),
+(4, '2026-05-19 18:00:00', 30000.0, 'CANCELADA'),
+(5, '2026-05-20 09:15:00', 12000.0, 'CONFIRMADA');
 
 --changeset barbershop:4
 INSERT INTO detalle_reservas (reserva_id, id_producto, precio_unitario) VALUES

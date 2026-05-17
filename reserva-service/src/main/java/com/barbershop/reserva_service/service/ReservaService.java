@@ -56,6 +56,7 @@ public class ReservaService {
     }
 
     public void deleteById(Long id) { reservaRepository.deleteById(id); }
+    
     // Nuevo endpoint 1: Búsqueda por Usuario
     public List<Reserva> findByIdUsuario(Long idUsuario) {
         return reservaRepository.findByIdUsuario(idUsuario);
@@ -65,4 +66,5 @@ public class ReservaService {
     public Long contarTotalReservas() {
         return reservaRepository.count();
     }
+     
 }
