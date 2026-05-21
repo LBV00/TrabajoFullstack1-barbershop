@@ -1,13 +1,15 @@
 package com.barbershop.pago_service.controller;
 
+import com.barbershop.pago_service.dto.PagoDTO;
 import com.barbershop.pago_service.model.Pago;
 import com.barbershop.pago_service.service.PagoService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/pagos")
@@ -19,35 +21,34 @@ public class PagoController {
         this.pagoService = pagoService;
     }
 
-    @GetMapping
-    public ResponseEntity<List<Pago>> getAll() {
-        List<Pago> pagos = pagoService.findAll();
-        return pagos.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(pagos);
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<Pago> getById(@PathVariable Long id) {
-        Optional<Pago> pago = pagoService.findById(id);
-        return pago.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
-    }
-
+    // POST: Recibe un PagoDTO, lo valida con @Valid y dispara la doble comunicación
     @PostMapping
-    public ResponseEntity<Pago> create(@RequestBody Pago pago) {
-        Pago nuevoPago = pagoService.save(pago);
-        return ResponseEntity.status(HttpStatus.CREATED).body(nuevoPago);
+    public ResponseEntity<?> registrarPago(@Valid @RequestBody PagoDTO pagoDto) {
+        try {
+            Pago nuevoPago = pagoService.guardar(pagoDto.toModel());
+            return ResponseEntity.status(HttpStatus.CREATED).body(PagoDTO.fromModel(nuevoPago));
+        } catch (RuntimeException e) {
+            // Si el webclient arroja un false, capturamos el error y devolvemos 400 Bad Request
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Pago> update(@PathVariable Long id, @RequestBody Pago pago) {
-        if (pagoService.findById(id).isEmpty()) return ResponseEntity.notFound().build();
-        pago.setId(id);
-        return ResponseEntity.ok(pagoService.save(pago));
+    // GET: Lista todos los pagos en formato DTO
+    @GetMapping
+    public ResponseEntity<List<PagoDTO>> listarPagos() {
+        List<Pago> pagos = pagoService.listar();
+        if (pagos.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        List<PagoDTO> dtos = pagos.stream().map(PagoDTO::fromModel).collect(Collectors.toList());
+        return ResponseEntity.ok(dtos);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        if (pagoService.findById(id).isEmpty()) return ResponseEntity.notFound().build();
-        pagoService.deleteById(id);
-        return ResponseEntity.noContent().build();
+    // GET: Buscar un pago específico por ID
+    @GetMapping("/{id}")
+    public ResponseEntity<PagoDTO> buscarPago(@PathVariable Long id) {
+        return pagoService.buscarPorId(id)
+                .map(pago -> ResponseEntity.ok(PagoDTO.fromModel(pago)))
+                .orElse(ResponseEntity.notFound().build());
     }
 }

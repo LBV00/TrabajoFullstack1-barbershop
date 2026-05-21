@@ -1,13 +1,20 @@
 package com.barbershop.pago_service;
 
 import org.springframework.boot.SpringApplication;
+
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @SpringBootApplication
 public class PagoServiceApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(PagoServiceApplication.class, args);
-	}
-
+    public static void main(String[] args) {
+        SpringApplication.run(PagoServiceApplication.class, args);
+    }
+    // ¡Este Bean es obligatorio para que el WebClient funcione!
+    @Bean
+    public WebClient webClient() {
+        return WebClient.builder().build();
+    }
 }

@@ -14,9 +14,14 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class Pago {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    // NUEVO: Agregamos al usuario para forzar la comunicación con user-service
+    @Column(name = "id_usuario", nullable = false)
+    private Long idUsuario;
 
     @Column(name = "id_reserva", nullable = false)
     private Long idReserva;

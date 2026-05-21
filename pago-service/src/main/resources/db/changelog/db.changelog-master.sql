@@ -3,21 +3,15 @@
 --changeset developer:1
 CREATE TABLE pagos (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario BIGINT NOT NULL,
     id_reserva BIGINT NOT NULL,
     monto DOUBLE NOT NULL,
     metodo_pago VARCHAR(50) NOT NULL,
-    fecha_pago DATETIME NOT NULL
+    fecha_pago DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 --changeset developer:2
-INSERT INTO pagos (id_reserva, monto, metodo_pago, fecha_pago) VALUES
-(1, 15000, 'EFECTIVO', '2026-05-01 10:30:00'),
-(2, 8000, 'TARJETA_CREDITO', '2026-05-02 11:15:00'),
-(3, 20000, 'TRANSFERENCIA', '2026-05-03 14:20:00'),
-(4, 17000, 'TARJETA_DEBITO', '2026-05-04 16:45:00'),
-(5, 12000, 'EFECTIVO', '2026-05-05 09:10:00'),
-(6, 5000, 'TARJETA_DEBITO', '2026-05-06 13:30:00'),
-(7, 25000, 'TRANSFERENCIA', '2026-05-07 15:00:00'),
-(8, 10000, 'EFECTIVO', '2026-05-08 17:20:00'),
-(9, 18000, 'TARJETA_CREDITO', '2026-05-09 10:05:00'),
-(10, 7000, 'TARJETA_DEBITO', '2026-05-10 12:40:00');
+INSERT INTO pagos (id_usuario, id_reserva, monto, metodo_pago, fecha_pago) VALUES
+(1, 1, 15000, 'TARJETA DE CREDITO', '2026-05-20 10:30:00'),
+(2, 2, 8000, 'EFECTIVO', '2026-05-20 11:45:00'),
+(1, 3, 20000, 'TRANSFERENCIA', '2026-05-21 15:20:00');
