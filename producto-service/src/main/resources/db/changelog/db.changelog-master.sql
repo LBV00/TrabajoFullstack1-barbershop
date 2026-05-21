@@ -1,22 +1,22 @@
 --liquibase formatted sql
 
 --changeset developer:1
-CREATE TABLE productos (
+CREATE TABLE producto (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL,
-    precio DOUBLE NOT NULL,
-    descripcion VARCHAR(200)
+    nombre VARCHAR(255),
+    precio DOUBLE,
+    stock INT
 );
 
 --changeset developer:2
-INSERT INTO productos (nombre, precio, descripcion) VALUES
-('Corte Clásico', 15000, 'Corte de cabello tradicional a tijera o máquina'),
-('Perfilado de Barba', 8000, 'Perfilado con navaja, vapor y toalla caliente'),
-('Corte + Barba (Combo)', 20000, 'Servicio completo de corte de cabello y arreglo de barba'),
-('Degradado (Fade)', 17000, 'Corte moderno con degradado a los lados'),
-('Corte de Niño', 12000, 'Corte clásico o moderno para menores de 12 años'),
-('Lavado y Peinado', 5000, 'Lavado con shampoo premium y peinado con cera o pomada'),
-('Tinte o Decoloración', 25000, 'Coloración completa o mechas para el cabello'),
-('Limpieza Facial', 10000, 'Limpieza profunda con exfoliación y mascarilla negra exfoliante'),
-('Corte a Navaja', 18000, 'Corte completo utilizando navaja clásica para un estilo retro'),
-('Diseño/Líneas (Hair Tattoo)', 7000, 'Diseños, grecas y líneas marcadas en el corte');
+INSERT INTO producto (nombre, precio, stock) VALUES
+('Laptop', 850000, 10),
+('Mouse', 15000, 50),
+('Teclado', 30000, 40),
+('Monitor', 200000, 15),
+('Impresora', 120000, 8),
+('Notebook', 650000, 12),
+('Disco SSD 1TB', 90000, 25),
+('Memoria RAM 16GB', 70000, 30),
+('Webcam HD', 25000, 20),
+('Audífonos', 40000, 35);
