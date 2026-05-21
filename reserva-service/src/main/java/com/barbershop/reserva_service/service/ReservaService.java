@@ -22,6 +22,11 @@ public class ReservaService {
     @Value("${api.user}")
     private String userPath;
 
+    
+    public boolean existePorId(Long id) {
+        return reservaRepository.existsById(id);
+    }
+
     public ReservaService(ReservaRepository reservaRepository, WebClient webClient) {
         this.reservaRepository = reservaRepository;
         this.webClient = webClient;

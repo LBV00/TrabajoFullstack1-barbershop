@@ -18,11 +18,11 @@ public class PagoService {
     private final PagoRepository pagoRepository;
     private final WebClient webClient;
 
-    // Rutas de validación conectadas al API Gateway (9090)
-    @Value("${api.usuario.exists:http://localhost:9090/usuarios/%d/exists}")
+    // Rutas de validación conectadas al API Gateway (7090)
+    @Value("${api.usuario.exists:http://localhost:7090/users/%d/exists}")
     private String usuarioPath;
 
-    @Value("${api.reserva.exists:http://localhost:9090/reservas/%d/exists}")
+    @Value("${api.reserva.exists:http://localhost:7090/reservas/%d/exists}")
     private String reservaPath;
 
     public PagoService(PagoRepository pagoRepository, WebClient webClient) {
@@ -64,5 +64,10 @@ public class PagoService {
 
     public Optional<Pago> buscarPorId(Long id) {
         return pagoRepository.findById(id);
+    }
+
+    // Método para eliminar un pago por su ID
+    public void eliminarPorId(Long id) {
+        pagoRepository.deleteById(id);
     }
 }

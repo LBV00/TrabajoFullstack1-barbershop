@@ -70,5 +70,9 @@ public class ReservaController {
         reservaService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
-    // Endpoint Personalizado 1: Buscar reservas de un cliente específico
+    @GetMapping("/{id}/exists")
+    public ResponseEntity<Boolean> existeReserva(@PathVariable Long id) {
+        return ResponseEntity.ok(reservaService.existePorId(id));
+    }
+    
 }

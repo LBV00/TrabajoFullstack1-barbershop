@@ -51,4 +51,34 @@ public class PagoController {
                 .map(pago -> ResponseEntity.ok(PagoDTO.fromModel(pago)))
                 .orElse(ResponseEntity.notFound().build());
     }
+        // PUT: Actualizar un Pago (re-valida con WebClient)
+    @PutMapping("/{id}")
+    public ResponseEntity<?> actualizarPago(@PathVariable Long id, @Valid @RequestBody PagoDTO pagoDto) {
+        return pagoService.buscarPorId(id).map(pagoActual -> {
+            try {
+                // Actualizamos los datos con lo que viene del JSON
+                pagoActual.setIdUsuario(pagoDto.getIdUsuario());
+                pagoActual.setIdReserva(pagoDto.getIdReserva());
+                pagoActual.setMonto(pagoDto.getMonto());
+                pagoActual.setMetodoPago(pagoDto.getMetodoPago());
+
+                // Guardamos (esto vuelve a disparar la validación del WebClient)
+                Pago pagoActualizado = pagoService.guardar(pagoActual);
+                return ResponseEntity.ok(PagoDTO.fromModel(pagoActualizado)); // Retorna 200 OK
+            } catch (RuntimeException e) {
+                // Si actualizan a un usuario/reserva falsa, lanza 400 Bad Request
+                return ResponseEntity.badRequest().body(e.getMessage());
+            }
+        }).orElse(ResponseEntity.notFound().build()); // 404 si el ID del pago no existe
+    }
+
+    // DELETE: Eliminar un Pago
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminarPago(@PathVariable Long id) {
+        return pagoService.buscarPorId(id).map(pago -> {
+            pagoService.eliminarPorId(id);
+            return ResponseEntity.noContent().<Void>build(); // Retorna 204 No Content según rúbrica
+        }).orElse(ResponseEntity.notFound().build()); // 404 si intentan borrar algo que no existe
+    }
+
 }
