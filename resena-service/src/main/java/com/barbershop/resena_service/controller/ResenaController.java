@@ -47,7 +47,24 @@ public class ResenaController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-
+    @PutMapping("/{id}")
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody Resena resena) {
+        Optional<Resena> existing = resenaService.findById(id);
+        if (existing.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        try {
+            Resena resenaActual = existing.get();
+            resenaActual.setIdUsuario(resena.getIdUsuario());
+            resenaActual.setIdReserva(resena.getIdReserva());
+            resenaActual.setCalificacion(resena.getCalificacion());
+            resenaActual.setComentario(resena.getComentario());
+            Resena actualizada = resenaService.save(resenaActual);
+            return ResponseEntity.ok(actualizada);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+            }
+    }
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         if (resenaService.findById(id).isEmpty()) return ResponseEntity.notFound().build();
