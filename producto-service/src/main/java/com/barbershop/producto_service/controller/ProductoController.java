@@ -41,4 +41,14 @@ public class ProductoController {
     public ResponseEntity<Boolean> existsProducto(@PathVariable Long id) {
         return ResponseEntity.ok(productoService.existsById(id));
     }
+    
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductoDTO> obtenerPorId(@PathVariable Long id) {
+        Producto producto = productoService.buscarPorId(id);
+        if (producto != null) {
+            return ResponseEntity.ok(ProductoDTO.fromModel(producto));
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }
