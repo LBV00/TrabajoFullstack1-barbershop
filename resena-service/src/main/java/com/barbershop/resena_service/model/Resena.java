@@ -19,13 +19,16 @@ public class Resena {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "id_cliente", nullable = false)
-    private Long idCliente;
+    @Column(name = "id_usuario", nullable = false)
+    private Long idUsuario;
+
+    @Column(name = "id_reserva", nullable = false)
+    private Long idReserva;
 
     @Column(nullable = false)
-    private Integer calificacion; // 1 a 5 estrellas
+    private Integer calificacion;
 
-    @Column(length = 300)
+    @Column(nullable = false, length = 255)
     private String comentario;
 
     @Column(name = "fecha_creacion")

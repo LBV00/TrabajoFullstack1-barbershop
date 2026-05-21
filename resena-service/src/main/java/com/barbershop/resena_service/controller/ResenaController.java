@@ -31,10 +31,10 @@ public class ResenaController {
         return resena.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // Endpoint Personalizado
-    @GetMapping("/cliente/{idCliente}")
-    public ResponseEntity<List<Resena>> getByIdCliente(@PathVariable Long idCliente) {
-        List<Resena> resenas = resenaService.findByIdCliente(idCliente);
+    // CORRECCIÓN: Actualizado a idUsuario y findByIdUsuario
+    @GetMapping("/usuario/{idUsuario}")
+    public ResponseEntity<List<Resena>> getByIdUsuario(@PathVariable Long idUsuario) {
+        List<Resena> resenas = resenaService.findByIdUsuario(idUsuario);
         return resenas.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(resenas);
     }
 
@@ -54,9 +54,9 @@ public class ResenaController {
         resenaService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
+    
     @GetMapping("/total")
     public ResponseEntity<Long> getTotalResenas() {
         return ResponseEntity.ok(resenaService.contarTotalResenas());
     }
-
 }
