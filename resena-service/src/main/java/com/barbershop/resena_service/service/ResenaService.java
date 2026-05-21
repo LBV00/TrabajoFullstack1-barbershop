@@ -1,5 +1,6 @@
 package com.barbershop.resena_service.service;
 
+import com.barbershop.resena_service.dto.ResenaDTO;
 import com.barbershop.resena_service.model.Resena;
 import com.barbershop.resena_service.repository.ResenaRepository;
 import org.slf4j.Logger;
@@ -17,13 +18,12 @@ import java.util.Optional;
 @Transactional
 public class ResenaService {
 
-    // Inicializamos el Logger 
     private static final Logger log = LoggerFactory.getLogger(ResenaService.class);
 
     private final ResenaRepository resenaRepository;
     private final WebClient webClient;
 
-    @Value("${api.user}") // Asegúrate de tener api.user=http://localhost:9090/usuarios/%d/exists en application.properties
+    @Value("${api.user}")
     private String userPath;
 
     public ResenaService(ResenaRepository resenaRepository, WebClient webClient) {
@@ -31,35 +31,54 @@ public class ResenaService {
         this.webClient = webClient;
     }
 
-    public Resena save(Resena resena) {
-        // CORRECCIÓN: Cambiado de getIdCliente() a getIdUsuario()
-        log.info("Iniciando validación para crear reseña del usuario ID: {}", resena.getIdUsuario());
+    // Valida usuario y guarda desde DTO
+    public Resena saveFromDto(ResenaDTO dto) {
+        log.info("Iniciando validación para crear reseña del usuario ID: {}", dto.getIdUsuario());
 
-        // Consultar si el usuario existe usando WebClient
-        Boolean existeCliente = webClient.get()
-                .uri(String.format(userPath, resena.getIdUsuario()))
+        Boolean existeUsuario = webClient.get()
+                .uri(String.format(userPath, dto.getIdUsuario()))
                 .retrieve()
                 .bodyToMono(Boolean.class)
                 .block();
 
-        if (Boolean.FALSE.equals(existeCliente)) {
-            log.error("ERROR: No se pudo crear la reseña. El usuario ID {} no existe.", resena.getIdUsuario());
-            throw new RuntimeException("El cliente no existe en la base de datos.");
+        if (Boolean.FALSE.equals(existeUsuario)) {
+            log.error("ERROR: No se pudo crear la reseña. El usuario ID {} no existe.", dto.getIdUsuario());
+            throw new RuntimeException("El usuario con ID " + dto.getIdUsuario() + " no existe en el sistema.");
         }
 
-        resena.setFechaCreacion(LocalDateTime.now());
+        Resena resena = Resena.builder()
+                .idUsuario(dto.getIdUsuario())
+                .idReserva(dto.getIdReserva())
+                .calificacion(dto.getCalificacion())
+                .comentario(dto.getComentario())
+                .fechaCreacion(LocalDateTime.now())
+                .build();
+
         Resena guardada = resenaRepository.save(resena);
-        log.info("¡Éxito! Reseña ID {} guardada correctamente.", guardada.getId());
+        log.info("Reseña ID {} creada correctamente para usuario ID {}.", guardada.getId(), dto.getIdUsuario());
         return guardada;
+    }
+
+    // Actualiza una reseña existente (sin re-validar usuario, ya está en el sistema)
+    public Resena actualizar(Long id, ResenaDTO dto) {
+        log.info("Actualizando reseña ID: {}", id);
+        Resena existente = resenaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Reseña con ID " + id + " no encontrada."));
+
+        existente.setCalificacion(dto.getCalificacion());
+        existente.setComentario(dto.getComentario());
+
+        Resena actualizada = resenaRepository.save(existente);
+        log.info("Reseña ID {} actualizada correctamente.", id);
+        return actualizada;
     }
 
     public List<Resena> findAll() { return resenaRepository.findAll(); }
 
     public Optional<Resena> findById(Long id) { return resenaRepository.findById(id); }
 
-    // CORRECCIÓN: Cambiado a findByIdUsuario para que coincida con el modelo y el Repository
     public List<Resena> findByIdUsuario(Long idUsuario) {
-        log.info("Buscando el historial de reseñas del usuario ID: {}", idUsuario);
+        log.info("Buscando historial de reseñas del usuario ID: {}", idUsuario);
         return resenaRepository.findByIdUsuario(idUsuario);
     }
 
@@ -67,10 +86,9 @@ public class ResenaService {
         resenaRepository.deleteById(id);
         log.warn("Se ha eliminado la reseña ID: {}", id);
     }
-    
-    // Nuevo endpoint para contar el total
+
     public Long contarTotalResenas() {
-        log.info("Calculando el total de reseñas registradas");
-        return resenaRepository.count(); // Spring Data JPA trae count() por defecto
+        log.info("Calculando el total de reseñas registradas.");
+        return resenaRepository.count();
     }
 }
