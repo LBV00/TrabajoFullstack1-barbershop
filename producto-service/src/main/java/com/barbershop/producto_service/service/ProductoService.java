@@ -29,8 +29,12 @@ public class ProductoService {
     // Vital para la comunicación con reserva-service
     public Boolean existsById(Long id) { return productoRepository.existsById(id); }
 
-    
+
     public Producto buscarPorId(Long id) {
         return productoRepository.findById(id).orElse(null);
+    }
+    
+    public void eliminarPorId(Long id) {
+        productoRepository.deleteById(id);
     }
 }

@@ -41,7 +41,7 @@ public class ProductoController {
     public ResponseEntity<Boolean> existsProducto(@PathVariable Long id) {
         return ResponseEntity.ok(productoService.existsById(id));
     }
-    
+
     @GetMapping("/{id}")
     public ResponseEntity<ProductoDTO> obtenerPorId(@PathVariable Long id) {
         Producto producto = productoService.buscarPorId(id);
@@ -49,6 +49,37 @@ public class ProductoController {
             return ResponseEntity.ok(ProductoDTO.fromModel(producto));
         } else {
             return ResponseEntity.notFound().build();
+        }
+    }
+     // PUT - Actualizar un Producto
+    @PutMapping("/{id}")
+    public ResponseEntity<ProductoDTO> actualizar(@PathVariable Long id, @Valid @RequestBody ProductoDTO productoDto) {
+        Producto productoActual = productoService.buscarPorId(id);
+        
+        if (productoActual != null) {
+            // Reemplazamos los datos antiguos por los nuevos que llegan del JSON
+            productoActual.setNombre(productoDto.getNombre());
+            productoActual.setPrecio(productoDto.getPrecio());
+            productoActual.setStock(productoDto.getStock());
+            
+            // Guardamos los cambios en la base de datos
+            Producto productoActualizado = productoService.save(productoActual);
+            return ResponseEntity.ok(ProductoDTO.fromModel(productoActualizado)); // Retorna 200 OK
+        } else {
+            return ResponseEntity.notFound().build(); // Retorna 404 si el ID no existe
+        }
+    }
+
+    // DELETE - Eliminar un Producto
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+        Producto productoActual = productoService.buscarPorId(id);
+        
+        if (productoActual != null) {
+            productoService.eliminarPorId(id);
+            return ResponseEntity.noContent().build(); // Retorna el código correcto: 204 No Content
+        } else {
+            return ResponseEntity.notFound().build(); // Retorna 404 si intentas borrar algo que no existe
         }
     }
 }
