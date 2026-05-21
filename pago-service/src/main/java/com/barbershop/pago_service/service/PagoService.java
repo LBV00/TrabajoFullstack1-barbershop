@@ -1,5 +1,6 @@
 package com.barbershop.pago_service.service;
 
+import com.barbershop.pago_service.exception.ResourceNotFoundException;
 import com.barbershop.pago_service.model.Pago;
 import com.barbershop.pago_service.repository.PagoRepository;
 import org.slf4j.Logger; // <-- AGREGADO
@@ -49,7 +50,7 @@ public class PagoService {
         if (Boolean.FALSE.equals(existeUsuario)) {
             // ---> AGREGADO: Log de error <---
             log.error("Fallo en la validación: El usuario con ID {} no existe.", pago.getIdUsuario());
-            throw new RuntimeException("ERROR: El usuario con ID " + pago.getIdUsuario() + " no existe.");
+            throw new ResourceNotFoundException("El usuario con ID " + pago.getIdUsuario() + " no existe.");
         }
 
         // 2. Comunicación con el microservicio de Reservas
@@ -62,7 +63,7 @@ public class PagoService {
         if (Boolean.FALSE.equals(existeReserva)) {
             // ---> AGREGADO: Log de error <---
             log.error("Fallo en la validación: La reserva con ID {} no existe.", pago.getIdReserva());
-            throw new RuntimeException("ERROR: La reserva con ID " + pago.getIdReserva() + " no existe.");
+            throw new ResourceNotFoundException("ERROR: La reserva con ID " + pago.getIdReserva() + " no existe.");
         }
 
         // ---> AGREGADO: Log de éxito <---
