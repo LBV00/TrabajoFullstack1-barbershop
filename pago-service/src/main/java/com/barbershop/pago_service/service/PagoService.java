@@ -2,6 +2,8 @@ package com.barbershop.pago_service.service;
 
 import com.barbershop.pago_service.model.Pago;
 import com.barbershop.pago_service.repository.PagoRepository;
+import org.slf4j.Logger; // <-- AGREGADO
+import org.slf4j.LoggerFactory; // <-- AGREGADO
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +16,9 @@ import java.util.Optional;
 @Service
 @Transactional
 public class PagoService {
+
+    // ---> AGREGADO: Instancia del Logger <---
+    private static final Logger log = LoggerFactory.getLogger(PagoService.class);
 
     private final PagoRepository pagoRepository;
     private final WebClient webClient;
@@ -31,6 +36,9 @@ public class PagoService {
     }
 
     public Pago guardar(Pago pago) {
+        // ---> AGREGADO: Log de inicio <---
+        log.info("Iniciando validación de pago para Usuario ID: {} y Reserva ID: {}", pago.getIdUsuario(), pago.getIdReserva());
+
         // 1. Comunicación con el microservicio de Usuarios
         Boolean existeUsuario = webClient.get()
                 .uri(String.format(usuarioPath, pago.getIdUsuario()))
@@ -39,6 +47,8 @@ public class PagoService {
                 .block(); // .block() hace que la petición sea síncrona
 
         if (Boolean.FALSE.equals(existeUsuario)) {
+            // ---> AGREGADO: Log de error <---
+            log.error("Fallo en la validación: El usuario con ID {} no existe.", pago.getIdUsuario());
             throw new RuntimeException("ERROR: El usuario con ID " + pago.getIdUsuario() + " no existe.");
         }
 
@@ -50,8 +60,13 @@ public class PagoService {
                 .block();
 
         if (Boolean.FALSE.equals(existeReserva)) {
+            // ---> AGREGADO: Log de error <---
+            log.error("Fallo en la validación: La reserva con ID {} no existe.", pago.getIdReserva());
             throw new RuntimeException("ERROR: La reserva con ID " + pago.getIdReserva() + " no existe.");
         }
+
+        // ---> AGREGADO: Log de éxito <---
+        log.info("Validaciones exitosas. Procesando el pago en la base de datos.");
 
         // Si ambos existen, asignamos la fecha y guardamos el pago en la BD
         pago.setFechaPago(LocalDateTime.now());
@@ -68,6 +83,8 @@ public class PagoService {
 
     // Método para eliminar un pago por su ID
     public void eliminarPorId(Long id) {
+        // ---> AGREGADO: Log de eliminación <---
+        log.info("Eliminando pago con ID: {}", id);
         pagoRepository.deleteById(id);
     }
 }
