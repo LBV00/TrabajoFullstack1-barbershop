@@ -80,5 +80,16 @@ public class PagoController {
             return ResponseEntity.noContent().<Void>build(); // Retorna 204 No Content según rúbrica
         }).orElse(ResponseEntity.notFound().build()); // 404 si intentan borrar algo que no existe
     }
+     @GetMapping("/usuario/{idUsuario}")
+    public ResponseEntity<List<Pago>> buscarPagosPorUsuario(@PathVariable Long idUsuario) {
+        return ResponseEntity.ok(pagoService.findByIdUsuario(idUsuario));
+    }
+
+    // Endpoint 2: Total de registros
+    // URL en Postman: GET http://localhost:7090/pagos/total
+    @GetMapping("/total")
+    public ResponseEntity<Long> totalDePagos() {
+        return ResponseEntity.ok(pagoService.contarTotalPagos());
+    }
 
 }

@@ -87,4 +87,14 @@ public class PagoService {
         log.info("Eliminando pago con ID: {}", id);
         pagoRepository.deleteById(id);
     }
+    
+    // 1. Búsqueda por atributo distinto al ID (por Usuario)
+    public List<Pago> findByIdUsuario(Long idUsuario) {
+        return pagoRepository.findByIdUsuario(idUsuario); 
+    }
+
+    // 2. Totales
+    public Long contarTotalPagos() {
+        return pagoRepository.count(); // count() viene incluido en JpaRepository
+    }
 }
