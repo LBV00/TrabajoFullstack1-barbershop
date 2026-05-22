@@ -33,6 +33,7 @@ spring:
               uri: http://localhost:7095
               predicates:
                 - Path=/resenas/**
+                
             - id: auth-service  
               uri: http://localhost:7096
               predicates:

@@ -10,16 +10,14 @@ CREATE TABLE IF NOT EXISTS usuarios_auth (
 );
 
 --changeset auth:2
-
--- la contraseña es simplemente de prueba cambiaar a futuro contraseña :1234--
 INSERT INTO usuarios_auth (username, password, rol) VALUES
-('admin',    '$2a$10$7QJ8zV6kL9mN2pX3sY4tOeWqA1bC5dE8fG0hI2jK4lM6nO8pQ0rS2', 'ADMIN'),
-('barbero1', '$2a$10$7QJ8zV6kL9mN2pX3sY4tOeWqA1bC5dE8fG0hI2jK4lM6nO8pQ0rS2', 'USER'),
-('barbero2', '$2a$10$7QJ8zV6kL9mN2pX3sY4tOeWqA1bC5dE8fG0hI2jK4lM6nO8pQ0rS2', 'USER'),
-('cliente1', '$2a$10$7QJ8zV6kL9mN2pX3sY4tOeWqA1bC5dE8fG0hI2jK4lM6nO8pQ0rS2', 'USER'),
-('cliente2', '$2a$10$7QJ8zV6kL9mN2pX3sY4tOeWqA1bC5dE8fG0hI2jK4lM6nO8pQ0rS2', 'USER'),
-('gerente',  '$2a$10$7QJ8zV6kL9mN2pX3sY4tOeWqA1bC5dE8fG0hI2jK4lM6nO8pQ0rS2', 'ADMIN'),
-('recep1',   '$2a$10$7QJ8zV6kL9mN2pX3sY4tOeWqA1bC5dE8fG0hI2jK4lM6nO8pQ0rS2', 'USER'),
-('recep2',   '$2a$10$7QJ8zV6kL9mN2pX3sY4tOeWqA1bC5dE8fG0hI2jK4lM6nO8pQ0rS2', 'USER'),
-('barbero3', '$2a$10$7QJ8zV6kL9mN2pX3sY4tOeWqA1bC5dE8fG0hI2jK4lM6nO8pQ0rS2', 'USER'),
-('barbero4', '$2a$10$7QJ8zV6kL9mN2pX3sY4tOeWqA1bC5dE8fG0hI2jK4lM6nO8pQ0rS2', 'USER');
+('admin',    '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'ADMIN'),
+('barbero1', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'USER'),
+('barbero2', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'USER'),
+('cliente1', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'USER'),
+('cliente2', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'USER'),
+('gerente',  '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'ADMIN'),
+('recep1',   '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'USER'),
+('recep2',   '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'USER'),
+('barbero3', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'USER'),
+('barbero4', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'USER');
