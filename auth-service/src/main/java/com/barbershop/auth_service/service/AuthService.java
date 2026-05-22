@@ -7,7 +7,6 @@ import com.barbershop.auth_service.repository.UsuarioAuthRepository;
 import com.barbershop.auth_service.security.JwtUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,11 +15,12 @@ public class AuthService {
     private static final Logger log = LoggerFactory.getLogger(AuthService.class);
     private final UsuarioAuthRepository repo;
     private final JwtUtil jwtUtil;
-    private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+    private final HashService hashService;
 
-    public AuthService(UsuarioAuthRepository repo, JwtUtil jwtUtil) {
+    public AuthService(UsuarioAuthRepository repo, JwtUtil jwtUtil, HashService hashService) {
         this.repo = repo;
         this.jwtUtil = jwtUtil;
+        this.hashService = hashService;
     }
 
     public LoginResponse login(LoginRequest request) {
@@ -37,7 +37,7 @@ public class AuthService {
             throw new RuntimeException("Usuario inactivo");
         }
 
-        if (!encoder.matches(request.getPassword(), usuario.getPassword())) {
+        if (!hashService.sha1(request.getPassword()).equals(usuario.getPassword())) {
             log.warn("Login fallido: contraseña incorrecta para '{}'", request.getUsername());
             throw new RuntimeException("Credenciales inválidas");
         }
@@ -53,11 +53,6 @@ public class AuthService {
                 .build();
     }
 
-    public boolean validarToken(String token) {
-        return jwtUtil.validateToken(token);
-    }
-
-    public String getUsernameDesdeToken(String token) {
-        return jwtUtil.getUsernameFromToken(token);
-    }
+    public boolean validarToken(String token) { return jwtUtil.validateToken(token); }
+    public String getUsernameDesdeToken(String token) { return jwtUtil.getUsernameFromToken(token); }
 }

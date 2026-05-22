@@ -10,14 +10,13 @@ CREATE TABLE IF NOT EXISTS usuarios_auth (
 );
 
 --changeset auth:2
-INSERT INTO usuarios_auth (username, password, rol) VALUES
-('admin',    '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'ADMIN'),
-('barbero1', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'USER'),
-('barbero2', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'USER'),
-('cliente1', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'USER'),
-('cliente2', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'USER'),
-('gerente',  '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'ADMIN'),
-('recep1',   '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'USER'),
-('recep2',   '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'USER'),
-('barbero3', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'USER'),
-('barbero4', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'USER');
+INSERT INTO usuarios_auth (username, password, rol) VALUES ('admin', '7110eda4d09e062aa5e4a390b0a572ac0d2c0220', 'ADMIN');
+INSERT INTO usuarios_auth (username, password, rol) VALUES ('barbero1', '7110eda4d09e062aa5e4a390b0a572ac0d2c0220', 'USER');
+INSERT INTO usuarios_auth (username, password, rol) VALUES ('barbero2', '7110eda4d09e062aa5e4a390b0a572ac0d2c0220', 'USER');
+INSERT INTO usuarios_auth (username, password, rol) VALUES ('cliente1', '7110eda4d09e062aa5e4a390b0a572ac0d2c0220', 'USER');
+INSERT INTO usuarios_auth (username, password, rol) VALUES ('cliente2', '7110eda4d09e062aa5e4a390b0a572ac0d2c0220', 'USER');
+INSERT INTO usuarios_auth (username, password, rol) VALUES ('gerente', '7110eda4d09e062aa5e4a390b0a572ac0d2c0220', 'ADMIN');
+INSERT INTO usuarios_auth (username, password, rol) VALUES ('recep1', '7110eda4d09e062aa5e4a390b0a572ac0d2c0220', 'USER');
+INSERT INTO usuarios_auth (username, password, rol) VALUES ('recep2', '7110eda4d09e062aa5e4a390b0a572ac0d2c0220', 'USER');
+INSERT INTO usuarios_auth (username, password, rol) VALUES ('barbero3', '7110eda4d09e062aa5e4a390b0a572ac0d2c0220', 'USER');
+INSERT INTO usuarios_auth (username, password, rol) VALUES ('barbero4', '7110eda4d09e062aa5e4a390b0a572ac0d2c0220', 'USER');
