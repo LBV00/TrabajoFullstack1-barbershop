@@ -33,3 +33,11 @@ spring:
               uri: http://localhost:7095
               predicates:
                 - Path=/resenas/**
+            - id: auth-service  
+              uri: http://localhost:7096
+              predicates:
+                - Path=/auth/**
+
+
+jwt:
+  secret: barbershop-secret-key-2025-fullstack-duoc-uc-muy-segura

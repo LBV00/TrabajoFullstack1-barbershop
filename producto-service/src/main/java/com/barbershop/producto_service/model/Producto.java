@@ -1,26 +1,26 @@
 package com.barbershop.producto_service.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
-@Data // ¡Esta anotación es clave para que existan los Getters y Setters! [1]
+@Table(name = "productos")
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class Producto {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
+    @Column(name = "nombre", nullable = false, length = 100)
     private String nombre;
+
+    @Column(name = "precio", nullable = false)
     private Double precio;
-    private Integer stock; // ¡Debe existir esta variable!
+
+    @Column(name = "stock", nullable = false)
+    private Integer stock;
 }
