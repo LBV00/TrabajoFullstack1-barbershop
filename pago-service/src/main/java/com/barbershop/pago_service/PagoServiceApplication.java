@@ -12,7 +12,6 @@ public class PagoServiceApplication {
     public static void main(String[] args) {
         SpringApplication.run(PagoServiceApplication.class, args);
     }
-    // ¡Este Bean es obligatorio para que el WebClient funcione!
     @Bean
     public WebClient webClient() {
         return WebClient.builder().build();

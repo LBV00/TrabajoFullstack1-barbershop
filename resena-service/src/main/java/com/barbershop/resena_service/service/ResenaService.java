@@ -31,7 +31,6 @@ public class ResenaService {
         this.webClient = webClient;
     }
 
-    // Valida usuario y guarda desde DTO
     public Resena saveFromDto(ResenaDTO dto) {
         log.info("Iniciando validación para crear reseña del usuario ID: {}", dto.getIdUsuario());
 
@@ -59,7 +58,6 @@ public class ResenaService {
         return guardada;
     }
 
-    // Actualiza una reseña existente (sin re-validar usuario, ya está en el sistema)
     public Resena actualizar(Long id, ResenaDTO dto) {
         log.info("Actualizando reseña ID: {}", id);
         Resena existente = resenaRepository.findById(id)

@@ -25,7 +25,6 @@ public class ProductoDTO {
     @Positive(message = "El precio debe ser mayor a 0")
     private Double precio;
     
-    // CORRECCIÓN: Cambiamos descripcion por stock y añadimos validación
     @NotNull(message = "El stock es obligatorio")
     @PositiveOrZero(message = "El stock no puede ser negativo") 
     private Integer stock;
@@ -35,7 +34,7 @@ public class ProductoDTO {
                 .id(p.getId())
                 .nombre(p.getNombre())
                 .precio(p.getPrecio())
-                .stock(p.getStock()) // Ahora sí llama al stock
+                .stock(p.getStock()) 
                 .build();
     }
 
@@ -44,7 +43,7 @@ public class ProductoDTO {
                 .id(this.id)
                 .nombre(this.nombre)
                 .precio(this.precio)
-                .stock(this.stock) // Ahora sí llama al stock
+                .stock(this.stock) 
                 .build();
     }
 }

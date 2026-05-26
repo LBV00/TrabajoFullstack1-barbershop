@@ -19,7 +19,6 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
     private static final Logger log = LoggerFactory.getLogger(JwtAuthFilter.class);
     private final JwtUtil jwtUtil;
 
-    // Rutas que NO necesitan token (acceso público o llamadas internas entre microservicios)
     private static final List<String> PUBLIC_PATHS = List.of("/auth/login", "/auth/validar");
 
     public JwtAuthFilter(JwtUtil jwtUtil) {
@@ -30,11 +29,9 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         String path = exchange.getRequest().getURI().getPath();
 
-        // 1. Rutas públicas de autenticación (login, validar)
         boolean esPublica = PUBLIC_PATHS.stream().anyMatch(path::startsWith);
 
-        // 2. Endpoints internos usados por WebClient entre microservicios
-        //    Ej: /users/1/exists, /reservas/1/exists
+       
         boolean esInterna = path.endsWith("/exists");
 
         if (esPublica || esInterna) {
@@ -42,7 +39,7 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
             return chain.filter(exchange);
         }
 
-        // 3. Para todo lo demás, exigir token JWT
+       
         String authHeader = exchange.getRequest().getHeaders().getFirst("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             log.warn("Acceso denegado — sin token en: {}", path);
@@ -60,7 +57,7 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
         String username = jwtUtil.getUsernameFromToken(token);
         log.info("Acceso autorizado — usuario: {} → {}", username, path);
 
-        // Pasar el username al microservicio destino como header interno
+        
         ServerHttpRequest mutated = exchange.getRequest().mutate()
                 .header("X-Authenticated-User", username)
                 .build();

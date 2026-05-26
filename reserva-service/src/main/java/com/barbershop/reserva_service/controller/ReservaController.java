@@ -82,7 +82,6 @@ public class ReservaController {
         return ResponseEntity.ok(reservaService.existePorId(id));
     }
 
-    // Convierte entidad → DTO
     private ReservaDTO toDTO(Reserva r) {
         return ReservaDTO.builder()
                 .id(r.getId())
@@ -93,7 +92,6 @@ public class ReservaController {
                 .build();
     }
 
-    // Convierte DTO → entidad
     private Reserva toEntity(ReservaDTO dto) {
         return Reserva.builder()
                 .idUsuario(dto.getIdUsuario())

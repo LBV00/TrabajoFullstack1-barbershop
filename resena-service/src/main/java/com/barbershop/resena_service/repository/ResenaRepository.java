@@ -8,6 +8,5 @@ import java.util.List;
 @Repository
 public interface ResenaRepository extends JpaRepository<Resena, Long> {
     
-    // Spring Data JPA crea la query automática basada en este nombre
     List<Resena> findByIdUsuario(Long idUsuario);
 }

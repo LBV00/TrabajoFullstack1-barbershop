@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PagoRepository extends JpaRepository<Pago, Long> {
-     // Spring Data JPA crea la consulta SQL automáticamente por el nombre del método
     List<Pago> findByIdUsuario(Long idUsuario); 
+
 }

@@ -19,7 +19,6 @@ public class Pago {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // NUEVO: Agregamos al usuario para forzar la comunicación con user-service
     @Column(name = "id_usuario", nullable = false)
     private Long idUsuario;
 

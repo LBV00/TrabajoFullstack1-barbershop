@@ -21,34 +21,29 @@ public class ResenaController {
         this.resenaService = resenaService;
     }
 
-    // GET todos
     @GetMapping
     public ResponseEntity<List<Resena>> getAll() {
         List<Resena> resenas = resenaService.findAll();
         return resenas.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(resenas);
     }
 
-    // GET por ID
     @GetMapping("/{id}")
     public ResponseEntity<Resena> getById(@PathVariable Long id) {
         Optional<Resena> resena = resenaService.findById(id);
         return resena.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // GET por usuario (búsqueda por atributo distinto al ID de la tabla)
     @GetMapping("/usuario/{idUsuario}")
     public ResponseEntity<List<Resena>> getByIdUsuario(@PathVariable Long idUsuario) {
         List<Resena> resenas = resenaService.findByIdUsuario(idUsuario);
         return resenas.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(resenas);
     }
 
-    // GET total de reseñas
     @GetMapping("/total")
     public ResponseEntity<Long> getTotalResenas() {
         return ResponseEntity.ok(resenaService.contarTotalResenas());
     }
 
-    // POST: crear nueva reseña (valida con WebClient al user-service)
     @PostMapping
     public ResponseEntity<?> create(@Valid @RequestBody ResenaDTO resenaDto) {
         try {
@@ -59,7 +54,6 @@ public class ResenaController {
         }
     }
 
-    // PUT: actualizar una reseña existente
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody ResenaDTO resenaDto) {
         Optional<Resena> existente = resenaService.findById(id);
@@ -74,7 +68,6 @@ public class ResenaController {
         }
     }
 
-    // DELETE
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         if (resenaService.findById(id).isEmpty()) return ResponseEntity.notFound().build();

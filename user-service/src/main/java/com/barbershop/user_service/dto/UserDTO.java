@@ -32,7 +32,6 @@ public class UserDTO {
     
     private String telefono;
 
-    // Convertir de Entidad a DTO
     public static UserDTO fromModel(User user) {
         return UserDTO.builder()
                 .id(user.getId())
@@ -44,7 +43,6 @@ public class UserDTO {
                 .build();
     }
 
-    // Convertir de DTO a Entidad
     public User toModel() {
         return User.builder()
                 .id(this.id)

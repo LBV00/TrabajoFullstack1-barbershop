@@ -36,7 +36,6 @@ public class ProductoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(ProductoDTO.fromModel(nuevo));
     }
 
-    // Endpoint crucial consumido remotamente por reserva-service
     @GetMapping("/{id}/exists")
     public ResponseEntity<Boolean> existsProducto(@PathVariable Long id) {
         return ResponseEntity.ok(productoService.existsById(id));
@@ -51,18 +50,15 @@ public class ProductoController {
             return ResponseEntity.notFound().build();
         }
     }
-     // PUT - Actualizar un Producto
     @PutMapping("/{id}")
     public ResponseEntity<ProductoDTO> actualizar(@PathVariable Long id, @Valid @RequestBody ProductoDTO productoDto) {
         Producto productoActual = productoService.buscarPorId(id);
         
         if (productoActual != null) {
-            // Reemplazamos los datos antiguos por los nuevos que llegan del JSON
             productoActual.setNombre(productoDto.getNombre());
             productoActual.setPrecio(productoDto.getPrecio());
             productoActual.setStock(productoDto.getStock());
             
-            // Guardamos los cambios en la base de datos
             Producto productoActualizado = productoService.save(productoActual);
             return ResponseEntity.ok(ProductoDTO.fromModel(productoActualizado)); // Retorna 200 OK
         } else {
@@ -70,7 +66,6 @@ public class ProductoController {
         }
     }
 
-    // DELETE - Eliminar un Producto
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         Producto productoActual = productoService.buscarPorId(id);

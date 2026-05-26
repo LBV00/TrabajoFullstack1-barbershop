@@ -19,13 +19,11 @@ public class AuthController {
         this.authService = authService;
     }
 
-    // POST /auth/login — ruta pública, devuelve el JWT
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
 
-    // GET /auth/validar?token=xxx — usado por el gateway para validar
     @GetMapping("/validar")
     public ResponseEntity<Map<String, Object>> validar(@RequestParam String token) {
         boolean valido = authService.validarToken(token);

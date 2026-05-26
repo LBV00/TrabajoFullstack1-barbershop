@@ -63,7 +63,6 @@ public class UserController {
         return ResponseEntity.notFound().build();
     }
 
-    // Endpoint remoto para validar existencia desde Reserva-Service
     @GetMapping("/{id}/exists")
     public ResponseEntity<Boolean> existsUser(@PathVariable Long id) {
         return ResponseEntity.ok(userService.existsById(id));
