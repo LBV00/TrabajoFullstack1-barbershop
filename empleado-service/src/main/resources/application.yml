@@ -1,0 +1,19 @@
+server:
+  port: 7098
+
+spring:
+  application:
+    name: empleado-service
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/db_barbershop_empleados?createDatabaseIfNotExist=true
+    username: root
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.sql
