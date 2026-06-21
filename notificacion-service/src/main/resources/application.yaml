@@ -1,18 +1,18 @@
 server:
-  port: 7101
+  port: 7099
 
 spring:
   application:
-    name: sucursal-service
+    name: notificacion-service
 
   datasource:
-    url: jdbc:mysql://localhost:3306/db_barbershop_sucursal?createDatabaseIfNotExist=true
+    url: jdbc:mysql://localhost:3306/db_barbershop_notificaciones?createDatabaseIfNotExist=true
     username: root
     password:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     show-sql: true
 
   liquibase:

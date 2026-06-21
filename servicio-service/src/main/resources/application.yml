@@ -1,18 +1,18 @@
 server:
-  port: 7101
+  port: 7100
 
 spring:
   application:
-    name: sucursal-service
+    name: servicio-service
 
   datasource:
-    url: jdbc:mysql://localhost:3306/db_barbershop_sucursal?createDatabaseIfNotExist=true
+    url: jdbc:mysql://localhost:3306/db_barbershop_servicios?createDatabaseIfNotExist=true
     username: root
     password:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     show-sql: true
 
   liquibase:
