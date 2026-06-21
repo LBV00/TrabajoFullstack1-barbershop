@@ -4,61 +4,65 @@ server:
 spring:
   main:
     web-application-type: reactive
+
   cloud:
     gateway:
       server:
         webflux:
           routes:
+
             - id: user-service
-              uri: http://localhost:7091
+              uri: http://user-service:7091
               predicates:
                 - Path=/users/**
 
             - id: reserva-service
-              uri: http://localhost:7092
+              uri: http://reserva-service:7092
               predicates:
                 - Path=/reservas/**
-            
+
             - id: producto-service
-              uri: http://localhost:7093
+              uri: http://producto-service:7093
               predicates:
                 - Path=/productos/**
-                
+
             - id: pago-service
-              uri: http://localhost:7094
+              uri: http://pago-service:7094
               predicates:
                 - Path=/pagos/**
 
             - id: resena-service
-              uri: http://localhost:7095
+              uri: http://resena-service:7095
               predicates:
                 - Path=/resenas/**
-                
-            - id: auth-service  
-              uri: http://localhost:7096
+
+            - id: auth-service
+              uri: http://auth-service:7096
               predicates:
                 - Path=/auth/**
+
             - id: empleado-service
-              uri: http://localhost:7097
+              uri: http://empleado-service:7097
               predicates:
                 - Path=/empleados/**
-                
+
             - id: inventario-service
-              uri: http://localhost:7098
+              uri: http://inventario-service:7098
               predicates:
                 - Path=/inventarios/**
+
             - id: notificacion-service
-              uri: http://localhost:7099
+              uri: http://notificacion-service:7099
               predicates:
-                - Path=/notificaciones/**    
+                - Path=/notificaciones/**
 
             - id: servicio-service
-              uri: http://localhost:7100
+              uri: http://servicio-service:7100
               predicates:
                 - Path=/servicios/**
 
             - id: sucursal-service
-              uri: http://localhost:7101
+              uri: http://sucursal-service:7101
               predicates:
                 - Path=/sucursales/**
 
