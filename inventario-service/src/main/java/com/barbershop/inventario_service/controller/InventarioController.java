@@ -4,6 +4,17 @@ import com.barbershop.inventario_service.dto.InventarioDTO;
 import com.barbershop.inventario_service.model.Inventario;
 import com.barbershop.inventario_service.service.InventarioService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+import jakarta.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +27,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/inventarios")
+@Tag(name = "Inventario", description = "Operaciones para administrar inventario")
 public class InventarioController {
 
     private static final Logger logger =
@@ -25,6 +37,12 @@ public class InventarioController {
     private InventarioService inventarioService;
 
     @GetMapping
+    @Operation(summary = "Listar inventario")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Inventario encontrado",
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = InventarioDTO.class)))),
+            @ApiResponse(responseCode = "204", description = "No existe inventario", content = @Content)
+    })
     public ResponseEntity<List<InventarioDTO>> getAll() {
 
         logger.info("Obteniendo inventario");
@@ -43,7 +61,13 @@ public class InventarioController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Buscar inventario por ID")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Inventario encontrado"),
+            @ApiResponse(responseCode = "404", description = "Inventario no encontrado")
+    })
     public ResponseEntity<InventarioDTO> getById(
+            @Parameter(description = "ID del inventario", example = "1", required = true)
             @PathVariable Long id) {
 
         Inventario inventario =
@@ -58,8 +82,13 @@ public class InventarioController {
     }
 
     @PostMapping
+    @Operation(summary = "Crear registro de inventario")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Inventario creado"),
+            @ApiResponse(responseCode = "400", description = "Datos inválidos")
+    })
     public ResponseEntity<InventarioDTO> create(
-            @RequestBody InventarioDTO inventarioDTO) {
+            @Valid @RequestBody InventarioDTO inventarioDTO) {
 
         Inventario savedInventario =
                 inventarioService.save(
@@ -70,9 +99,15 @@ public class InventarioController {
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Actualizar inventario")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Inventario actualizado"),
+            @ApiResponse(responseCode = "404", description = "Inventario no encontrado")
+    })
     public ResponseEntity<InventarioDTO> update(
+            @Parameter(description = "ID del inventario", example = "1", required = true)
             @PathVariable Long id,
-            @RequestBody InventarioDTO inventarioDTO) {
+            @Valid @RequestBody InventarioDTO inventarioDTO) {
 
         if (inventarioService.findById(id) != null) {
 
@@ -90,7 +125,13 @@ public class InventarioController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Eliminar inventario")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Inventario eliminado"),
+            @ApiResponse(responseCode = "404", description = "Inventario no encontrado")
+    })
     public ResponseEntity<Void> delete(
+            @Parameter(description = "ID del inventario", example = "1", required = true)
             @PathVariable Long id) {
 
         if (inventarioService.findById(id) != null) {
@@ -104,7 +145,11 @@ public class InventarioController {
     }
 
     @GetMapping("/{id}/exists")
+    @Operation(summary = "Comprobar si existe un inventario")
+    @ApiResponse(responseCode = "200", description = "Resultado de la comprobación",
+            content = @Content(schema = @Schema(implementation = Boolean.class)))
     public ResponseEntity<Boolean> existsInventario(
+            @Parameter(description = "ID del inventario", example = "1", required = true)
             @PathVariable Long id) {
 
         return ResponseEntity.ok(

@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-barbershop
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+
+  user-service:
+    build: ./user-service
+    container_name: user-service
+    depends_on:
+      - mysql
+    ports:
+      - "7091:7091"
+
+  auth-service:
+    build: ./auth-service
+    container_name: auth-service
+    depends_on:
+      - mysql
+    ports:
+      - "7096:7096"
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    depends_on:
+      - auth-service
+      - user-service
+    ports:
+      - "7090:7090"
+
+  resena-service:
+    build: ./resena-service
+    container_name: resena-service
+    depends_on:
+      - mysql
+    ports:
+      - "7095:7095"
+
+  empleado-service:
+    build: ./empleado-service
+    container_name: empleado-service
+    depends_on:
+      - mysql
+    ports:
+      - "7097:7097"
+
+  inventario-service:
+    build: ./inventario-service
+    container_name: inventario-service
+    depends_on:
+      - mysql
+    ports:
+      - "7098:7098"
+      
+  notificacion-service:
+    build: ./notificacion-service
+    container_name: notificacion-service
+    depends_on:
+      - mysql
+    ports:
+      - "7099:7099"
+
+  servicio-service:
+    build: ./servicio-service
+    container_name: servicio-service
+    depends_on:
+      - mysql
+    ports:
+      - "7100:7100"
+
+  sucursal-service:
+    build: ./sucursal-service
+    container_name: sucursal-service
+    depends_on:
+      - mysql
+    ports:
+      - "7101:7101"

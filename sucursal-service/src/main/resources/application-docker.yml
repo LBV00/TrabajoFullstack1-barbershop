@@ -1,0 +1,29 @@
+server:
+  port: 7101
+
+spring:
+  application:
+    name: sucursal-service
+
+  datasource:
+    url: jdbc:mysql://mysql:3306/db_barbershop_sucursal?createDatabaseIfNotExist=true
+    username: root
+    password: root
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.sql
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha

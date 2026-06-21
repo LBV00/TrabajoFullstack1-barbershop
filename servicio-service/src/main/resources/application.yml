@@ -17,3 +17,7 @@ spring:
 
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.sql
+    
+  pringdoc:
+    swagger-ui:
+    path: /swagger-ui.html
