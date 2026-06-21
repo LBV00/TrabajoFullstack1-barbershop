@@ -1,0 +1,22 @@
+package com.barbershop.inventario_service.model;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+@Entity
+@Table(name = "inventarios")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Inventario {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private Long productoId;
+
+    private Integer stock;
+
+    private String ubicacion;
+}
