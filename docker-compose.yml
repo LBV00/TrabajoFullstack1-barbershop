@@ -16,6 +16,16 @@ build: ./api-gateway
 container_name: api-gateway
 depends_on:
 - auth-service
+- user-service
+- reserva-service
+- producto-service
+- pago-service
+- resena-service
+- empleado-service
+- inventario-service
+- notificacion-service
+- servicio-service
+- sucursal-service
 ports:
 - "7090:7090"
 
@@ -67,21 +77,13 @@ depends_on:
 ports:
 - "7096:7096"
 
-sucursal-service:
-build: ./sucursal-service
-container_name: sucursal-service
+empleado-service:
+build: ./empleado-service
+container_name: empleado-service
 depends_on:
 - mysql
 ports:
-- "7103:7103"
-
-servicio-service:
-build: ./servicio-service
-container_name: servicio-service
-depends_on:
-- mysql
-ports:
-- "7104:7104"
+- "7097:7097"
 
 inventario-service:
 build: ./inventario-service
@@ -89,15 +91,7 @@ container_name: inventario-service
 depends_on:
 - mysql
 ports:
-- "7105:7105"
-
-empleado-service:
-build: ./empleado-service
-container_name: empleado-service
-depends_on:
-- mysql
-ports:
-- "7106:7106"
+- "7098:7098"
 
 notificacion-service:
 build: ./notificacion-service
@@ -105,4 +99,20 @@ container_name: notificacion-service
 depends_on:
 - mysql
 ports:
-- "7107:7107"
+- "7099:7099"
+
+servicio-service:
+build: ./servicio-service
+container_name: servicio-service
+depends_on:
+- mysql
+ports:
+- "7100:7100"
+
+sucursal-service:
+build: ./sucursal-service
+container_name: sucursal-service
+depends_on:
+- mysql
+ports:
+- "7101:7101"
