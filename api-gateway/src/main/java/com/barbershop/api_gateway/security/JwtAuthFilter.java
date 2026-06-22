@@ -19,7 +19,10 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
     private static final Logger log = LoggerFactory.getLogger(JwtAuthFilter.class);
     private final JwtUtil jwtUtil;
 
-    private static final List<String> PUBLIC_PATHS = List.of("/auth/login", "/auth/validar");
+    private static final List<String> PUBLIC_PATHS = List.of(
+            "/auth/login",
+            "/auth/validar"
+    );
 
     public JwtAuthFilter(JwtUtil jwtUtil) {
         this.jwtUtil = jwtUtil;
@@ -27,20 +30,28 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+
         String path = exchange.getRequest().getURI().getPath();
 
         boolean esPublica = PUBLIC_PATHS.stream().anyMatch(path::startsWith);
 
-       
         boolean esInterna = path.endsWith("/exists");
 
-        if (esPublica || esInterna) {
-            log.debug("Acceso libre a ruta pública/interna: {}", path);
+        boolean esSwagger =
+                path.contains("/swagger-ui")
+                        || path.contains("/v3/api-docs")
+                        || path.equals("/swagger-ui.html")
+                        || path.contains("/webjars");
+
+        if (esPublica || esInterna || esSwagger) {
+            log.debug("Acceso libre: {}", path);
             return chain.filter(exchange);
         }
 
-       
-        String authHeader = exchange.getRequest().getHeaders().getFirst("Authorization");
+        String authHeader = exchange.getRequest()
+                .getHeaders()
+                .getFirst("Authorization");
+
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             log.warn("Acceso denegado — sin token en: {}", path);
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
@@ -48,6 +59,7 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
         }
 
         String token = authHeader.substring(7);
+
         if (!jwtUtil.validateToken(token)) {
             log.warn("Acceso denegado — token inválido en: {}", path);
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
@@ -55,16 +67,23 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
         }
 
         String username = jwtUtil.getUsernameFromToken(token);
+
         log.info("Acceso autorizado — usuario: {} → {}", username, path);
 
-        
-        ServerHttpRequest mutated = exchange.getRequest().mutate()
+        ServerHttpRequest mutated = exchange.getRequest()
+                .mutate()
                 .header("X-Authenticated-User", username)
                 .build();
 
-        return chain.filter(exchange.mutate().request(mutated).build());
+        return chain.filter(
+                exchange.mutate()
+                        .request(mutated)
+                        .build()
+        );
     }
 
     @Override
-    public int getOrder() { return -1; }
+    public int getOrder() {
+        return -1;
+    }
 }
