@@ -6,7 +6,7 @@ spring:
     name: reserva-service
 
   datasource:
-    url: jdbc:mysql://mysql:3306/db_barbershop_reserva?createDatabaseIfNotExist=true
+    url: jdbc:mysql://mysql:3306/db_barbershop_reservas?createDatabaseIfNotExist=true
     username: root
     password: root
 

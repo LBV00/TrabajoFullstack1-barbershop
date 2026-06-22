@@ -6,7 +6,7 @@ spring:
     name: resena-service
 
   datasource:
-    url: jdbc:mysql://mysql:3306/db_barbershop_resena?createDatabaseIfNotExist=true
+    url: jdbc:mysql://mysql:3306/db_barbershop_resenas?createDatabaseIfNotExist=true
     username: root
     password: root
 

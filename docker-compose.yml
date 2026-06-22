@@ -1,54 +1,82 @@
-version: '3.8'
-
 services:
 
   mysql:
     image: mysql:8.0
     container_name: mysql-barbershop
     restart: always
+
     environment:
       MYSQL_ROOT_PASSWORD: root
+
     ports:
       - "3306:3306"
+
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
 
   user-service:
     build: ./user-service
     container_name: user-service
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     ports:
       - "7091:7091"
 
-  auth-service:
-    build: ./auth-service
-    container_name: auth-service
+  reserva-service:
+    build: ./reserva-service
+    container_name: reserva-service
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     ports:
-      - "7096:7096"
+      - "7092:7092"
 
-  api-gateway:
-    build: ./api-gateway
-    container_name: api-gateway
+  producto-service:
+    build: ./producto-service
+    container_name: producto-service
     depends_on:
-      - auth-service
-      - user-service
+      mysql:
+        condition: service_healthy
     ports:
-      - "7090:7090"
+      - "7093:7093"
+
+  pago-service:
+    build: ./pago-service
+    container_name: pago-service
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "7094:7094"
 
   resena-service:
     build: ./resena-service
     container_name: resena-service
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     ports:
       - "7095:7095"
+
+  auth-service:
+    build: ./auth-service
+    container_name: auth-service
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "7096:7096"
 
   empleado-service:
     build: ./empleado-service
     container_name: empleado-service
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     ports:
       - "7097:7097"
 
@@ -56,15 +84,17 @@ services:
     build: ./inventario-service
     container_name: inventario-service
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     ports:
       - "7098:7098"
-      
+
   notificacion-service:
     build: ./notificacion-service
     container_name: notificacion-service
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     ports:
       - "7099:7099"
 
@@ -72,7 +102,8 @@ services:
     build: ./servicio-service
     container_name: servicio-service
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     ports:
       - "7100:7100"
 
@@ -80,6 +111,25 @@ services:
     build: ./sucursal-service
     container_name: sucursal-service
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     ports:
       - "7101:7101"
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    depends_on:
+      - auth-service
+      - user-service
+      - reserva-service
+      - producto-service
+      - pago-service
+      - resena-service
+      - empleado-service
+      - inventario-service
+      - notificacion-service
+      - servicio-service
+      - sucursal-service
+    ports:
+      - "7090:7090"

@@ -3,7 +3,7 @@ server:
 
 spring:
   datasource:
-    url: jdbc:mysql://mysql:3306/db_barbershop_user?createDatabaseIfNotExist=true
+    url: jdbc:mysql://mysql:3306/db_barbershop_users?createDatabaseIfNotExist=true
     username: root
     password: root
 

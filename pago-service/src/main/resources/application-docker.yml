@@ -6,7 +6,7 @@ spring:
     name: pago-service
 
   datasource:
-    url: jdbc:mysql://mysql:3306/db_barbershop_pago?createDatabaseIfNotExist=true
+    url: jdbc:mysql://mysql:3306/db_barbershop_pagos?createDatabaseIfNotExist=true
     username: root
     password: root
 

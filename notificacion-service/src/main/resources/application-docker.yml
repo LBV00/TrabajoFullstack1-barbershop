@@ -6,7 +6,7 @@ spring:
     name: notificacion-service
 
   datasource:
-    url: jdbc:mysql://mysql:3306/db_barbershop_notificacion?createDatabaseIfNotExist=true
+    url: jdbc:mysql://mysql:3306/db_barbershop_notificaciones?createDatabaseIfNotExist=true
     username: root
     password: root
 

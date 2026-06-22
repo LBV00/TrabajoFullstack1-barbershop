@@ -6,7 +6,7 @@ spring:
     name: producto-service
 
   datasource:
-    url: jdbc:mysql://mysql:3306/db_barbershop_producto?createDatabaseIfNotExist=true
+    url: jdbc:mysql://mysql:3306/db_barbershop_productos?createDatabaseIfNotExist=true
     username: root
     password: root
 
