@@ -66,5 +66,99 @@ spring:
               predicates:
                 - Path=/sucursales/**
 
+            # Swagger Docs
+
+            - id: user-docs
+              uri: http://user-service:7091
+              predicates:
+                - Path=/users/v3/api-docs
+
+            - id: reserva-docs
+              uri: http://reserva-service:7092
+              predicates:
+                - Path=/reservas/v3/api-docs
+
+            - id: producto-docs
+              uri: http://producto-service:7093
+              predicates:
+                - Path=/productos/v3/api-docs
+
+            - id: pago-docs
+              uri: http://pago-service:7094
+              predicates:
+                - Path=/pagos/v3/api-docs
+
+            - id: resena-docs
+              uri: http://resena-service:7095
+              predicates:
+                - Path=/resenas/v3/api-docs
+
+            - id: auth-docs
+              uri: http://auth-service:7096
+              predicates:
+                - Path=/auth/v3/api-docs
+
+            - id: empleado-docs
+              uri: http://empleado-service:7097
+              predicates:
+                - Path=/empleados/v3/api-docs
+
+            - id: inventario-docs
+              uri: http://inventario-service:7098
+              predicates:
+                - Path=/inventarios/v3/api-docs
+
+            - id: notificacion-docs
+              uri: http://notificacion-service:7099
+              predicates:
+                - Path=/notificaciones/v3/api-docs
+
+            - id: servicio-docs
+              uri: http://servicio-service:7100
+              predicates:
+                - Path=/servicios/v3/api-docs
+
+            - id: sucursal-docs
+              uri: http://sucursal-service:7101
+              predicates:
+                - Path=/sucursales/v3/api-docs
+
 jwt:
   secret: barbershop-secret-key-2025-fullstack-duoc-uc-muy-segura
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    urls:
+      - name: Auth Service
+        url: /auth/v3/api-docs
+
+      - name: User Service
+        url: /users/v3/api-docs
+
+      - name: Reserva Service
+        url: /reservas/v3/api-docs
+
+      - name: Producto Service
+        url: /productos/v3/api-docs
+
+      - name: Pago Service
+        url: /pagos/v3/api-docs
+
+      - name: Reseña Service
+        url: /resenas/v3/api-docs
+
+      - name: Empleado Service
+        url: /empleados/v3/api-docs
+
+      - name: Inventario Service
+        url: /inventarios/v3/api-docs
+
+      - name: Notificacion Service
+        url: /notificaciones/v3/api-docs
+
+      - name: Servicio Service
+        url: /servicios/v3/api-docs
+
+      - name: Sucursal Service
+        url: /sucursales/v3/api-docs
