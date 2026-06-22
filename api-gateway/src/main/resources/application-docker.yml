@@ -72,26 +72,3 @@ jwt:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
-    urls:
-      - name: Auth Service
-        url: /auth/v3/api-docs
-      - name: User Service
-        url: /users/v3/api-docs
-      - name: Reserva Service
-        url: /reservas/v3/api-docs
-      - name: Producto Service
-        url: /productos/v3/api-docs
-      - name: Pago Service
-        url: /pagos/v3/api-docs
-      - name: Resena Service
-        url: /resenas/v3/api-docs
-      - name: Empleado Service
-        url: /empleados/v3/api-docs
-      - name: Inventario Service
-        url: /inventarios/v3/api-docs
-      - name: Notificacion Service
-        url: /notificaciones/v3/api-docs
-      - name: Servicio Service
-        url: /servicios/v3/api-docs
-      - name: Sucursal Service
-        url: /sucursales/v3/api-docs
