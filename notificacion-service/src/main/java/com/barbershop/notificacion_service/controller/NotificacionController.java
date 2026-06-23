@@ -13,7 +13,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import com.barbershop.notificacion_service.assembler.NotificacionModelAssembler;
 
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.CollectionModel;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 import jakarta.validation.Valid;
 
 import org.slf4j.Logger;
@@ -34,52 +39,44 @@ public class NotificacionController {
     private static final Logger logger =
             LoggerFactory.getLogger(NotificacionController.class);
 
-    @Autowired
-    private NotificacionService notificacionService;
+    private final NotificacionService notificacionService;
+    private final NotificacionModelAssembler assembler;
+    public NotificacionController(
+        NotificacionService notificacionService,
+        NotificacionModelAssembler assembler) {
+
+    this.notificacionService = notificacionService;
+    this.assembler = assembler;
+    }
 
     @GetMapping
     @Operation(summary = "Listar notificaciones")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Notificaciones encontradas",
-                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = NotificacionDTO.class)))),
-            @ApiResponse(responseCode = "204", description = "No existen notificaciones", content = @Content)
-    })
-    public ResponseEntity<List<NotificacionDTO>> getAll() {
-
-        logger.info("Obteniendo notificaciones");
-
-        List<Notificacion> notificaciones = notificacionService.findAll();
-
-        if (notificaciones.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-
-        List<NotificacionDTO> dtos = notificaciones.stream()
-                .map(NotificacionDTO::fromModel)
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(dtos);
-    }
+    public ResponseEntity<CollectionModel<EntityModel<NotificacionDTO>>> getAll() {
+    List<EntityModel<NotificacionDTO>> notificaciones =
+            notificacionService.findAll()
+                    .stream()
+                    .map(assembler::toModel)
+                    .toList();
+    CollectionModel<EntityModel<NotificacionDTO>> collection =
+            CollectionModel.of(
+                    notificaciones,
+                    linkTo(methodOn(NotificacionController.class)
+                            .getAll())
+                            .withSelfRel()
+            );
+    return ResponseEntity.ok(collection);
+   }
 
     @GetMapping("/{id}")
     @Operation(summary = "Buscar notificación por ID")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Notificación encontrada"),
-            @ApiResponse(responseCode = "404", description = "Notificación no encontrada")
-    })
-    public ResponseEntity<NotificacionDTO> getById(
-            @Parameter(description = "ID de la notificación", example = "1", required = true)
-            @PathVariable Long id) {
-
-        Notificacion notificacion =
-                notificacionService.findById(id);
-
-        if (notificacion != null) {
-            return ResponseEntity.ok(
-                    NotificacionDTO.fromModel(notificacion));
-        }
-
+    public ResponseEntity<EntityModel<NotificacionDTO>> getById(
+        @PathVariable Long id) {Notificacion notificacion = notificacionService.findById(id);
+    if (notificacion == null) {
         return ResponseEntity.notFound().build();
+    }
+    return ResponseEntity.ok(
+            assembler.toModel(notificacion)
+    );
     }
 
     @PostMapping
