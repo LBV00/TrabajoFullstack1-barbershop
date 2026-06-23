@@ -3,7 +3,12 @@ package com.barbershop.servicio_service.controller;
 import com.barbershop.servicio_service.dto.ServicioDTO;
 import com.barbershop.servicio_service.model.Servicio;
 import com.barbershop.servicio_service.service.ServicioService;
+import com.barbershop.servicio_service.assembler.ServicioModelAssembler;
 
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.CollectionModel;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -35,55 +40,47 @@ public class ServicioController {
     private static final Logger logger =
             LoggerFactory.getLogger(ServicioController.class);
 
-    @Autowired
-    private ServicioService servicioService;
+    private final ServicioService servicioService;
+    private final ServicioModelAssembler assembler;
+
+    public ServicioController(
+        ServicioService servicioService,
+        ServicioModelAssembler assembler) {
+
+    this.servicioService = servicioService;
+    this.assembler = assembler;
+    }
 
     @GetMapping
-    @Operation(summary = "Listar servicios", description = "Obtiene todos los servicios registrados.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Servicios encontrados",
-                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = ServicioDTO.class)))),
-            @ApiResponse(responseCode = "204", description = "No existen servicios", content = @Content)
-    })
-    public ResponseEntity<List<ServicioDTO>> getAll() {
-
-        logger.info("Obteniendo todos los servicios");
-
-        List<Servicio> servicios = servicioService.findAll();
-
-        if (servicios.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-
-        List<ServicioDTO> dtos = servicios.stream()
-                .map(ServicioDTO::fromModel)
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(dtos);
+    @Operation(summary = "Listar servicios")
+        public ResponseEntity<CollectionModel<EntityModel<ServicioDTO>>> getAll() {
+    List<EntityModel<ServicioDTO>> servicios =
+            servicioService.findAll()
+                    .stream()
+                    .map(assembler::toModel)
+                    .toList();
+    CollectionModel<EntityModel<ServicioDTO>> collection =
+            CollectionModel.of(
+                    servicios,
+                    linkTo(methodOn(ServicioController.class)
+                            .getAll())
+                            .withSelfRel()
+            );
+        return ResponseEntity.ok(collection);
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Buscar servicio por ID")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Servicio encontrado",
-                    content = @Content(schema = @Schema(implementation = ServicioDTO.class))),
-            @ApiResponse(responseCode = "404", description = "Servicio no encontrado", content = @Content)
-    })
-    public ResponseEntity<ServicioDTO> getById(
-            @Parameter(description = "ID del servicio", example = "1", required = true)
-            @PathVariable Long id) {
-
-        logger.info("Buscando servicio {}", id);
-
-        Servicio servicio = servicioService.findById(id);
-
-        if (servicio != null) {
-            return ResponseEntity.ok(
-                    ServicioDTO.fromModel(servicio));
-        }
-
+        public ResponseEntity<EntityModel<ServicioDTO>> getById(
+        @PathVariable Long id) {
+    Servicio servicio = servicioService.findById(id);
+    if (servicio == null) {
         return ResponseEntity.notFound().build();
     }
+    return ResponseEntity.ok(
+            assembler.toModel(servicio)
+    );
+   } 
 
     @PostMapping
     @Operation(summary = "Crear servicio")
