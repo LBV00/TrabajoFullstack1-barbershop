@@ -13,7 +13,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import com.barbershop.inventario_service.assembler.InventarioModelAssembler;
 
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.CollectionModel;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 import jakarta.validation.Valid;
 
 import org.slf4j.Logger;
@@ -34,53 +39,49 @@ public class InventarioController {
     private static final Logger logger =
             LoggerFactory.getLogger(InventarioController.class);
 
-    @Autowired
-    private InventarioService inventarioService;
+    private final InventarioService inventarioService;
+    private final InventarioModelAssembler assembler;
+    public InventarioController(
+        InventarioService inventarioService,
+        InventarioModelAssembler assembler) {
+     this.inventarioService = inventarioService;
+     this.assembler = assembler;
+     }
 
     @GetMapping
     @Operation(summary = "Listar inventario")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Inventario encontrado",
-                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = InventarioDTO.class)))),
-            @ApiResponse(responseCode = "204", description = "No existe inventario", content = @Content)
-    })
-    public ResponseEntity<List<InventarioDTO>> getAll() {
+     public ResponseEntity<CollectionModel<EntityModel<InventarioDTO>>> getAll() {
+    logger.info("Obteniendo inventario");
+    List<EntityModel<InventarioDTO>> inventarios =
+            inventarioService.findAll()
+                    .stream()
+                    .map(assembler::toModel)
+                    .toList();
 
-        logger.info("Obteniendo inventario");
+    CollectionModel<EntityModel<InventarioDTO>> collection =
+            CollectionModel.of(
+                    inventarios,
+                    linkTo(methodOn(InventarioController.class)
+                            .getAll())
+                            .withSelfRel()
+            );
 
-        List<Inventario> inventarios = inventarioService.findAll();
-
-        if (inventarios.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-
-        List<InventarioDTO> dtos = inventarios.stream()
-                .map(InventarioDTO::fromModel)
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(dtos);
-    }
+    return ResponseEntity.ok(collection);
+     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Buscar inventario por ID")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Inventario encontrado"),
-            @ApiResponse(responseCode = "404", description = "Inventario no encontrado")
-    })
-    public ResponseEntity<InventarioDTO> getById(
-            @Parameter(description = "ID del inventario", example = "1", required = true)
-            @PathVariable Long id) {
-
-        Inventario inventario =
-                inventarioService.findById(id);
-
-        if (inventario != null) {
-            return ResponseEntity.ok(
-                    InventarioDTO.fromModel(inventario));
-        }
-
+    public ResponseEntity<EntityModel<InventarioDTO>> getById(
+        @PathVariable Long id) {
+    Inventario inventario =
+            inventarioService.findById(id);
+    if (inventario == null) {
         return ResponseEntity.notFound().build();
     }
+    return ResponseEntity.ok(
+            assembler.toModel(inventario)
+    );
+    } 
 
     @PostMapping
     @Operation(summary = "Crear registro de inventario")
