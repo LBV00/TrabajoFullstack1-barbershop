@@ -4,146 +4,140 @@ server:
 spring:
   main:
     web-application-type: reactive
-
   cloud:
     gateway:
-      server:
-        webflux:
-          routes:
+      routes:
+        # --- USER SERVICE ---
+        - id: user-service
+          uri: http://localhost:7091
+          predicates:
+            - Path=/users/**
+        - id: user-docs
+          uri: http://localhost:7091
+          predicates:
+            - Path=/users/v3/api-docs
+          filters:
+            - SetPath=/v3/api-docs
 
-            - id: user-service
-              uri: http://user-service:7091
-              predicates:
-                - Path=/users/**
+        # --- RESERVA SERVICE ---
+        - id: reserva-service
+          uri: http://localhost:7092
+          predicates:
+            - Path=/reservas/**
+        - id: reserva-docs
+          uri: http://localhost:7092
+          predicates:
+            - Path=/reservas/v3/api-docs
+          filters:
+            - SetPath=/v3/api-docs
 
-            - id: reserva-service
-              uri: http://reserva-service:7092
-              predicates:
-                - Path=/reservas/**
+        # --- PRODUCTO SERVICE ---
+        - id: producto-service
+          uri: http://localhost:7093
+          predicates:
+            - Path=/productos/**
+        - id: producto-docs
+          uri: http://localhost:7093
+          predicates:
+            - Path=/productos/v3/api-docs
+          filters:
+            - SetPath=/v3/api-docs
 
-            - id: producto-service
-              uri: http://producto-service:7093
-              predicates:
-                - Path=/productos/**
+        # --- PAGO SERVICE ---
+        - id: pago-service
+          uri: http://localhost:7094
+          predicates:
+            - Path=/pagos/**
+        - id: pago-docs
+          uri: http://localhost:7094
+          predicates:
+            - Path=/pagos/v3/api-docs
+          filters:
+            - SetPath=/v3/api-docs
 
-            - id: pago-service
-              uri: http://pago-service:7094
-              predicates:
-                - Path=/pagos/**
+        # --- RESENA SERVICE ---
+        - id: resena-service
+          uri: http://localhost:7095
+          predicates:
+            - Path=/resenas/**
+        - id: resena-docs
+          uri: http://localhost:7095
+          predicates:
+            - Path=/resenas/v3/api-docs
+          filters:
+            - SetPath=/v3/api-docs
 
-            - id: resena-service
-              uri: http://resena-service:7095
-              predicates:
-                - Path=/resenas/**
+        # --- AUTH SERVICE ---
+        - id: auth-service
+          uri: http://localhost:7096
+          predicates:
+            - Path=/auth/**
+        - id: auth-docs
+          uri: http://localhost:7096
+          predicates:
+            - Path=/auth/v3/api-docs
+          filters:
+            - SetPath=/v3/api-docs
 
-            - id: auth-service
-              uri: http://auth-service:7096
-              predicates:
-                - Path=/auth/**
+        # --- EMPLEADO SERVICE ---
+        - id: empleado-service
+          uri: http://localhost:7097
+          predicates:
+            - Path=/empleados/**
+        - id: empleado-docs
+          uri: http://localhost:7097
+          predicates:
+            - Path=/empleados/v3/api-docs
+          filters:
+            - SetPath=/v3/api-docs
 
-            - id: empleado-service
-              uri: http://empleado-service:7097
-              predicates:
-                - Path=/empleados/**
+        # --- INVENTARIO SERVICE ---
+        - id: inventario-service
+          uri: http://localhost:7098
+          predicates:
+            - Path=/inventarios/**
+        - id: inventario-docs
+          uri: http://localhost:7098
+          predicates:
+            - Path=/inventarios/v3/api-docs
+          filters:
+            - SetPath=/v3/api-docs
 
-            - id: inventario-service
-              uri: http://inventario-service:7098
-              predicates:
-                - Path=/inventarios/**
+        # --- NOTIFICACION SERVICE ---
+        - id: notificacion-service
+          uri: http://localhost:7099
+          predicates:
+            - Path=/notificaciones/**
+        - id: notificacion-docs
+          uri: http://localhost:7099
+          predicates:
+            - Path=/notificaciones/v3/api-docs
+          filters:
+            - SetPath=/v3/api-docs
 
-            - id: notificacion-service
-              uri: http://notificacion-service:7099
-              predicates:
-                - Path=/notificaciones/**
+        # --- SERVICIO SERVICE ---
+        - id: servicio-service
+          uri: http://localhost:7100
+          predicates:
+            - Path=/servicios/**
+        - id: servicio-docs
+          uri: http://localhost:7100
+          predicates:
+            - Path=/servicios/v3/api-docs
+          filters:
+            - SetPath=/v3/api-docs
 
-            - id: servicio-service
-              uri: http://servicio-service:7100
-              predicates:
-                - Path=/servicios/**
-
-            - id: sucursal-service
-              uri: http://sucursal-service:7101
-              predicates:
-                - Path=/sucursales/**
-
-            # Swagger Docs
-
-            - id: auth-docs
-              uri: http://auth-service:7096
-              predicates:
-                - Path=/auth/v3/api-docs
-              filters:
-                - SetPath=/v3/api-docs
-
-            - id: user-docs
-              uri: http://user-service:7091
-              predicates:
-                - Path=/users/v3/api-docs
-              filters:
-                - SetPath=/v3/api-docs
-
-            - id: reserva-docs
-              uri: http://reserva-service:7092
-              predicates:
-                - Path=/reservas/v3/api-docs
-              filters:
-                - SetPath=/v3/api-docs
-
-            - id: producto-docs
-              uri: http://producto-service:7093
-              predicates:
-                - Path=/productos/v3/api-docs
-              filters:
-                - SetPath=/v3/api-docs
-
-            - id: pago-docs
-              uri: http://pago-service:7094
-              predicates:
-                - Path=/pagos/v3/api-docs
-              filters:
-                - SetPath=/v3/api-docs
-
-            - id: resena-docs
-              uri: http://resena-service:7095
-              predicates:
-                - Path=/resenas/v3/api-docs
-              filters:
-                - SetPath=/v3/api-docs
-
-            - id: empleado-docs
-              uri: http://empleado-service:7097
-              predicates:
-                - Path=/empleados/v3/api-docs
-              filters:
-                - SetPath=/v3/api-docs
-
-            - id: inventario-docs
-              uri: http://inventario-service:7098
-              predicates:
-                - Path=/inventarios/v3/api-docs
-              filters:
-                - SetPath=/v3/api-docs
-
-            - id: notificacion-docs
-              uri: http://notificacion-service:7099
-              predicates:
-                - Path=/notificaciones/v3/api-docs
-              filters:
-                - SetPath=/v3/api-docs
-
-            - id: servicio-docs
-              uri: http://servicio-service:7100
-              predicates:
-                - Path=/servicios/v3/api-docs
-              filters:
-                - SetPath=/v3/api-docs
-
-            - id: sucursal-docs
-              uri: http://sucursal-service:7101
-              predicates:
-                - Path=/sucursales/v3/api-docs
-              filters:
-                - SetPath=/v3/api-docs
+        # --- SUCURSAL SERVICE ---
+        - id: sucursal-service
+          uri: http://localhost:7101
+          predicates:
+            - Path=/sucursales/**
+        - id: sucursal-docs
+          uri: http://localhost:7101
+          predicates:
+            - Path=/sucursales/v3/api-docs
+          filters:
+            - SetPath=/v3/api-docs
 
 jwt:
   secret: barbershop-secret-key-2025-fullstack-duoc-uc-muy-segura
@@ -154,33 +148,23 @@ springdoc:
     urls:
       - name: Auth Service
         url: /auth/v3/api-docs
-
       - name: User Service
         url: /users/v3/api-docs
-
       - name: Reserva Service
         url: /reservas/v3/api-docs
-
       - name: Producto Service
         url: /productos/v3/api-docs
-
       - name: Pago Service
         url: /pagos/v3/api-docs
-
       - name: Resena Service
         url: /resenas/v3/api-docs
-
       - name: Empleado Service
         url: /empleados/v3/api-docs
-
       - name: Inventario Service
         url: /inventarios/v3/api-docs
-
       - name: Notificacion Service
         url: /notificaciones/v3/api-docs
-
       - name: Servicio Service
         url: /servicios/v3/api-docs
-
       - name: Sucursal Service
         url: /sucursales/v3/api-docs
