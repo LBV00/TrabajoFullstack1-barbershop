@@ -73,14 +73,13 @@ public class SucursalController {
      })
     public ResponseEntity<EntityModel<SucursalDTO>> getById(
         @PathVariable Long id) {
-     Sucursal sucursal = sucursalService.findById(id);
-     if (sucursal == null) {
-        return ResponseEntity.notFound().build();
+
+    return ResponseEntity.ok(
+            assembler.toModel(
+                    sucursalService.findById(id)
+            )
+      );
      }
-     return ResponseEntity.ok(
-        assembler.toModel(sucursal)
-     );
-  }
 
     @PostMapping
     @Operation(summary = "Crear sucursal")
