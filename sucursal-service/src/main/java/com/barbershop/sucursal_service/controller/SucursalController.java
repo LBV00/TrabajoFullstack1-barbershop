@@ -13,7 +13,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import com.barbershop.sucursal_service.assembler.SucursalModelAssembler;
 
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.CollectionModel;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,54 +38,49 @@ public class SucursalController {
     private static final Logger logger =
             LoggerFactory.getLogger(SucursalController.class);
 
-    @Autowired
-    private SucursalService sucursalService;
+    private final SucursalService sucursalService;
+    private final SucursalModelAssembler assembler;
+    public SucursalController(
+        SucursalService sucursalService,
+        SucursalModelAssembler assembler) {
 
+    this.sucursalService = sucursalService;
+    this.assembler = assembler;
+   }
     @GetMapping
-    @Operation(summary = "Listar sucursales", description = "Obtiene todas las sucursales registradas.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Sucursales encontradas",
-                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = SucursalDTO.class)))),
-            @ApiResponse(responseCode = "204", description = "No existen sucursales", content = @Content)
-    })
-    public ResponseEntity<List<SucursalDTO>> getAll() {
-
-        logger.info("Obteniendo todas las sucursales");
-
-        List<Sucursal> sucursales = sucursalService.findAll();
-
-        if (sucursales.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-
-        List<SucursalDTO> dtos = sucursales.stream()
-                .map(SucursalDTO::fromModel)
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(dtos);
-    }
+    @Operation(summary = "Listar sucursales")
+  public ResponseEntity<CollectionModel<EntityModel<SucursalDTO>>> getAll() {
+    List<EntityModel<SucursalDTO>> sucursales =
+            sucursalService.findAll()
+                    .stream()
+                    .map(assembler::toModel)
+                    .toList();
+    CollectionModel<EntityModel<SucursalDTO>> collection =
+            CollectionModel.of(
+                    sucursales,
+                    linkTo(methodOn(SucursalController.class)
+                            .getAll())
+                            .withSelfRel()
+            );
+    return ResponseEntity.ok(collection);
+  }
 
     @GetMapping("/{id}")
     @Operation(summary = "Buscar sucursal por ID")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Sucursal encontrada",
-                    content = @Content(schema = @Schema(implementation = SucursalDTO.class))),
-            @ApiResponse(responseCode = "404", description = "Sucursal no encontrada", content = @Content)
-    })
-    public ResponseEntity<SucursalDTO> getById(
-            @Parameter(description = "ID de la sucursal", example = "1", required = true)
-            @PathVariable Long id) {
-
-        logger.info("Buscando sucursal {}", id);
-
-        Sucursal sucursal = sucursalService.findById(id);
-
-        if (sucursal != null) {
-            return ResponseEntity.ok(SucursalDTO.fromModel(sucursal));
-        }
-
+        @ApiResponse(responseCode = "200", description = "Sucursal encontrada"),
+        @ApiResponse(responseCode = "404", description = "Sucursal no encontrada")
+     })
+    public ResponseEntity<EntityModel<SucursalDTO>> getById(
+        @PathVariable Long id) {
+     Sucursal sucursal = sucursalService.findById(id);
+     if (sucursal == null) {
         return ResponseEntity.notFound().build();
-    }
+     }
+     return ResponseEntity.ok(
+        assembler.toModel(sucursal)
+     );
+  }
 
     @PostMapping
     @Operation(summary = "Crear sucursal")

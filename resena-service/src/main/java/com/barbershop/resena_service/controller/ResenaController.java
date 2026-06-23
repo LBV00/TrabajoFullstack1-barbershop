@@ -13,7 +13,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import com.barbershop.resena_service.assembler.ResenaModelAssembler;
 
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.CollectionModel;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
@@ -29,45 +34,45 @@ import java.util.Optional;
 public class ResenaController {
 
     private final ResenaService resenaService;
+    private final ResenaModelAssembler assembler;
 
-    public ResenaController(ResenaService resenaService) {
-        this.resenaService = resenaService;
+    public ResenaController(
+        ResenaService resenaService,
+        ResenaModelAssembler assembler) {
+     this.resenaService = resenaService;
+     this.assembler = assembler;
     }
 
     @GetMapping
-    @Operation(summary = "Listar reseñas", description = "Obtiene todas las reseñas registradas.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Reseñas encontradas",
-                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = Resena.class)))),
-            @ApiResponse(responseCode = "204", description = "No existen reseñas", content = @Content)
-    })
-    public ResponseEntity<List<Resena>> getAll() {
+    @Operation(summary = "Listar reseñas")
+    public ResponseEntity<CollectionModel<EntityModel<ResenaDTO>>> getAll() {
 
-        List<Resena> resenas = resenaService.findAll();
+    List<EntityModel<ResenaDTO>> resenas =
+            resenaService.findAll()
+                    .stream()
+                    .map(assembler::toModel)
+                    .toList();
 
-        if (resenas.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-
-        return ResponseEntity.ok(resenas);
-    }
+    CollectionModel<EntityModel<ResenaDTO>> collection =
+            CollectionModel.of(
+                    resenas,
+                    linkTo(methodOn(ResenaController.class)
+                            .getAll())
+                            .withSelfRel()
+            );
+    return ResponseEntity.ok(collection);
+     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Buscar reseña por ID")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Reseña encontrada",
-                    content = @Content(schema = @Schema(implementation = Resena.class))),
-            @ApiResponse(responseCode = "404", description = "Reseña no encontrada", content = @Content)
-    })
-    public ResponseEntity<Resena> getById(
-            @Parameter(description = "ID de la reseña", example = "1", required = true)
-            @PathVariable Long id) {
+    public ResponseEntity<EntityModel<ResenaDTO>> getById(
+        @PathVariable Long id) {
 
-        Optional<Resena> resena = resenaService.findById(id);
-
-        return resena.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
-    }
+    return resenaService.findById(id)
+            .map(assembler::toModel)
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
+       }
 
     @GetMapping("/usuario/{idUsuario}")
     @Operation(summary = "Buscar reseñas por usuario")

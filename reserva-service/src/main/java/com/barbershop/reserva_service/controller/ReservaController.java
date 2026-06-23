@@ -16,7 +16,12 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.barbershop.reserva_service.assembler.ReservaModelAssembler;
 
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.CollectionModel;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 import java.util.List;
 import java.util.stream.Collectors;
 @SecurityRequirement(name = "bearerAuth")
@@ -26,47 +31,43 @@ import java.util.stream.Collectors;
 public class ReservaController {
 
     private final ReservaService reservaService;
+    private final ReservaModelAssembler assembler;
 
-    public ReservaController(ReservaService reservaService) {
-        this.reservaService = reservaService;
+    public ReservaController(
+        ReservaService reservaService,
+        ReservaModelAssembler assembler) {
+
+    this.reservaService = reservaService;
+    this.assembler = assembler;
     }
 
     @GetMapping
-    @Operation(summary = "Listar reservas", description = "Obtiene todas las reservas registradas.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Reservas encontradas",
-                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = ReservaDTO.class)))),
-            @ApiResponse(responseCode = "204", description = "No existen reservas", content = @Content)
-    })
-    public ResponseEntity<List<ReservaDTO>> getAll() {
-        List<Reserva> reservas = reservaService.findAll();
-
-        if (reservas.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-
-        List<ReservaDTO> dtos = reservas.stream()
-                .map(this::toDTO)
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(dtos);
-    }
+    @Operation(summary = "Listar reservas")
+    public ResponseEntity<CollectionModel<EntityModel<ReservaDTO>>> getAll() {
+    List<EntityModel<ReservaDTO>> reservas =
+            reservaService.findAll()
+                    .stream()
+                    .map(assembler::toModel)
+                    .toList();
+    CollectionModel<EntityModel<ReservaDTO>> collection =
+            CollectionModel.of(
+                    reservas,
+                    linkTo(methodOn(ReservaController.class)
+                            .getAll())
+                            .withSelfRel()
+            );
+    return ResponseEntity.ok(collection);
+   }
 
     @GetMapping("/{id}")
     @Operation(summary = "Buscar reserva por ID")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Reserva encontrada",
-                    content = @Content(schema = @Schema(implementation = ReservaDTO.class))),
-            @ApiResponse(responseCode = "404", description = "Reserva no encontrada", content = @Content)
-    })
-    public ResponseEntity<ReservaDTO> getById(
-            @Parameter(description = "ID de la reserva", example = "1", required = true)
-            @PathVariable Long id) {
-
-        return reservaService.findById(id)
-                .map(r -> ResponseEntity.ok(toDTO(r)))
-                .orElse(ResponseEntity.notFound().build());
-    }
+        public ResponseEntity<EntityModel<ReservaDTO>> getById(
+        @PathVariable Long id) {
+    return reservaService.findById(id)
+            .map(assembler::toModel)
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
+        }
 
     @GetMapping("/cliente/{idUsuario}")
     @Operation(summary = "Buscar reservas por usuario")
