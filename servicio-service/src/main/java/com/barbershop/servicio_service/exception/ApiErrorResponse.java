@@ -1,4 +1,4 @@
-package com.barbershop.user_service.exception;
+package com.barbershop.servicio_service.exception;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.OffsetDateTime;
 import lombok.AllArgsConstructor;
