@@ -1,4 +1,4 @@
-package com.barbershop.user_service.exception;
+package com.barbershop.inventario_service.exception;
 
 import java.time.OffsetDateTime;
 

@@ -1,7 +1,9 @@
 package com.barbershop.inventario_service.service;
 
+import com.barbershop.inventario_service.exception.ResourceNotFoundException;
 import com.barbershop.inventario_service.model.Inventario;
 import com.barbershop.inventario_service.repository.InventarioRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +20,11 @@ public class InventarioService {
     }
 
     public Inventario findById(Long id) {
-        return repository.findById(id).orElse(null);
+
+        return repository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Inventario con ID " + id + " no encontrado"));
     }
 
     public Inventario save(Inventario inventario) {
@@ -26,6 +32,12 @@ public class InventarioService {
     }
 
     public void delete(Long id) {
+
+        if (!repository.existsById(id)) {
+            throw new ResourceNotFoundException(
+                    "Inventario con ID " + id + " no encontrado");
+        }
+
         repository.deleteById(id);
     }
 
