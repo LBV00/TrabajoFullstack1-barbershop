@@ -1,22 +1,41 @@
-services:
+version: '3.8'
 
+services:
+  # ==========================================
+  # BASE DE DATOS (Centralizada con Healthcheck)
+  # ==========================================
   mysql:
     image: mysql:8.0
     container_name: mysql-barbershop
     restart: always
-
     environment:
       MYSQL_ROOT_PASSWORD: root
-
     ports:
       - "3306:3306"
-
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot"]
-      interval: 10s
-      timeout: 5s
-      retries: 20
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "root", "-proot"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
 
+  # ==========================================
+  # API GATEWAY (Puerto público: 7090)
+  # ==========================================
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    ports:
+      - "7090:7090"
+    depends_on:
+      - auth-service
+      - user-service
+      - reserva-service
+
+  # ==========================================
+  # ECOSISTEMA DE 11 MICROSERVICIOS
+  # ==========================================
   user-service:
     build: ./user-service
     container_name: user-service
@@ -115,21 +134,3 @@ services:
         condition: service_healthy
     ports:
       - "7101:7101"
-
-  api-gateway:
-    build: ./api-gateway
-    container_name: api-gateway
-    depends_on:
-      - auth-service
-      - user-service
-      - reserva-service
-      - producto-service
-      - pago-service
-      - resena-service
-      - empleado-service
-      - inventario-service
-      - notificacion-service
-      - servicio-service
-      - sucursal-service
-    ports:
-      - "7090:7090"
