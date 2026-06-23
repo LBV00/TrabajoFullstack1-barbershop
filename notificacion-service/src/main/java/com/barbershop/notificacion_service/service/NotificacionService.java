@@ -1,7 +1,9 @@
 package com.barbershop.notificacion_service.service;
 
+import com.barbershop.notificacion_service.exception.ResourceNotFoundException;
 import com.barbershop.notificacion_service.model.Notificacion;
 import com.barbershop.notificacion_service.repository.NotificacionRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +20,11 @@ public class NotificacionService {
     }
 
     public Notificacion findById(Long id) {
-        return repository.findById(id).orElse(null);
+
+        return repository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Notificación con ID " + id + " no encontrada"));
     }
 
     public Notificacion save(Notificacion notificacion) {
@@ -26,6 +32,12 @@ public class NotificacionService {
     }
 
     public void delete(Long id) {
+
+        if (!repository.existsById(id)) {
+            throw new ResourceNotFoundException(
+                    "Notificación con ID " + id + " no encontrada");
+        }
+
         repository.deleteById(id);
     }
 
