@@ -16,7 +16,12 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.barbershop.pago_service.assembler.PagoModelAssembler;
 
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.CollectionModel;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 import java.util.List;
 import java.util.stream.Collectors;
 @SecurityRequirement(name = "bearerAuth")
@@ -26,10 +31,15 @@ import java.util.stream.Collectors;
 public class PagoController {
 
     private final PagoService pagoService;
+    private final PagoModelAssembler assembler;
 
-    public PagoController(PagoService pagoService) {
-        this.pagoService = pagoService;
-    }
+    public PagoController(
+        PagoService pagoService,
+        PagoModelAssembler assembler) {
+
+    this.pagoService = pagoService;
+    this.assembler = assembler;
+   }
 
     @PostMapping
     @Operation(summary = "Registrar pago")
@@ -49,41 +59,35 @@ public class PagoController {
 
     @GetMapping
     @Operation(summary = "Listar pagos")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Pagos encontrados",
-                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = PagoDTO.class)))),
-            @ApiResponse(responseCode = "204", description = "No existen pagos", content = @Content)
-    })
-    public ResponseEntity<List<PagoDTO>> listarPagos() {
+    public ResponseEntity<CollectionModel<EntityModel<PagoDTO>>> listarPagos() {
 
-        List<Pago> pagos = pagoService.listar();
+    List<EntityModel<PagoDTO>> pagos =
+            pagoService.listar()
+                    .stream()
+                    .map(assembler::toModel)
+                    .toList();
 
-        if (pagos.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
+    CollectionModel<EntityModel<PagoDTO>> collection =
+            CollectionModel.of(
+                    pagos,
+                    linkTo(methodOn(PagoController.class)
+                            .listarPagos())
+                            .withSelfRel()
+            );
 
-        List<PagoDTO> dtos = pagos.stream()
-                .map(PagoDTO::fromModel)
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(dtos);
+    return ResponseEntity.ok(collection);
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Buscar pago por ID")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Pago encontrado",
-                    content = @Content(schema = @Schema(implementation = PagoDTO.class))),
-            @ApiResponse(responseCode = "404", description = "Pago no encontrado", content = @Content)
-    })
-    public ResponseEntity<PagoDTO> buscarPago(
-            @Parameter(description = "ID del pago", example = "1", required = true)
-            @PathVariable Long id) {
+    public ResponseEntity<EntityModel<PagoDTO>> buscarPago(
+        @PathVariable Long id) {
 
-        return pagoService.buscarPorId(id)
-                .map(pago -> ResponseEntity.ok(PagoDTO.fromModel(pago)))
-                .orElse(ResponseEntity.notFound().build());
-    }
+    return pagoService.buscarPorId(id)
+            .map(assembler::toModel)
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
+ }
 
     @PutMapping("/{id}")
     @Operation(summary = "Actualizar pago")

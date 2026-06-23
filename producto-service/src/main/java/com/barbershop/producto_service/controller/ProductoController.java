@@ -13,7 +13,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import com.barbershop.producto_service.assembler.ProductoModelAssembler;
 
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.CollectionModel;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
@@ -29,31 +34,35 @@ import java.util.stream.Collectors;
 public class ProductoController {
 
     private final ProductoService productoService;
+    private final ProductoModelAssembler assembler;
 
-    public ProductoController(ProductoService productoService) {
-        this.productoService = productoService;
-    }
+    public ProductoController(
+        ProductoService productoService,
+        ProductoModelAssembler assembler) {
+
+    this.productoService = productoService;
+    this.assembler = assembler;
+  }
 
     @GetMapping
     @Operation(summary = "Listar productos")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Productos encontrados",
-                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = ProductoDTO.class)))),
-            @ApiResponse(responseCode = "204", description = "No existen productos", content = @Content)
-    })
-    public ResponseEntity<List<ProductoDTO>> getAll() {
+    public ResponseEntity<CollectionModel<EntityModel<ProductoDTO>>> getAll() {
 
-        List<Producto> productos = productoService.findAll();
+    List<EntityModel<ProductoDTO>> productos =
+            productoService.findAll()
+                    .stream()
+                    .map(assembler::toModel)
+                    .toList();
 
-        if (productos.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
+     CollectionModel<EntityModel<ProductoDTO>> collection =
+            CollectionModel.of(
+                    productos,
+                    linkTo(methodOn(ProductoController.class)
+                            .getAll())
+                            .withSelfRel()
+            );
 
-        List<ProductoDTO> dtos = productos.stream()
-                .map(ProductoDTO::fromModel)
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(dtos);
+     return ResponseEntity.ok(collection);
     }
 
     @PostMapping
@@ -87,24 +96,19 @@ public class ProductoController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Buscar producto por ID")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Producto encontrado",
-                    content = @Content(schema = @Schema(implementation = ProductoDTO.class))),
-            @ApiResponse(responseCode = "404", description = "Producto no encontrado")
-    })
-    public ResponseEntity<ProductoDTO> obtenerPorId(
-            @Parameter(description = "ID del producto", example = "1", required = true)
-            @PathVariable Long id) {
+public ResponseEntity<EntityModel<ProductoDTO>> obtenerPorId(
+        @PathVariable Long id) {
 
-        Producto producto = productoService.buscarPorId(id);
+    Producto producto = productoService.buscarPorId(id);
 
-        if (producto != null) {
-            return ResponseEntity.ok(
-                    ProductoDTO.fromModel(producto));
-        }
-
+    if (producto == null) {
         return ResponseEntity.notFound().build();
     }
+
+    return ResponseEntity.ok(
+            assembler.toModel(producto)
+    );
+}
 
     @PutMapping("/{id}")
     @Operation(summary = "Actualizar producto")
