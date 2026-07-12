@@ -1,6 +1,6 @@
 package com.barbershop.reserva_service.assembler;
 
-import com.barbershop.reserva_service.controller.ReservaController;
+import com.barbershop.reserva_service.controller.ReservaControllerV2;
 import com.barbershop.reserva_service.dto.ReservaDTO;
 import com.barbershop.reserva_service.model.Reserva;
 
@@ -27,11 +27,11 @@ public class ReservaModelAssembler
 
         return EntityModel.of(dto,
 
-                linkTo(methodOn(ReservaController.class)
+                linkTo(methodOn(ReservaControllerV2.class)
                         .getById(reserva.getId()))
                         .withSelfRel(),
 
-                linkTo(methodOn(ReservaController.class)
+                linkTo(methodOn(ReservaControllerV2.class)
                         .getAll())
                         .withRel("reservas"));
     }

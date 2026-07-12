@@ -1,6 +1,6 @@
 package com.barbershop.servicio_service.assembler;
 
-import com.barbershop.servicio_service.controller.ServicioController;
+import com.barbershop.servicio_service.controller.ServicioControllerV2;
 import com.barbershop.servicio_service.dto.ServicioDTO;
 import com.barbershop.servicio_service.model.Servicio;
 
@@ -21,11 +21,11 @@ public class ServicioModelAssembler
 
         return EntityModel.of(dto,
 
-                linkTo(methodOn(ServicioController.class)
+                linkTo(methodOn(ServicioControllerV2.class)
                         .getById(servicio.getId()))
                         .withSelfRel(),
 
-                linkTo(methodOn(ServicioController.class)
+                linkTo(methodOn(ServicioControllerV2.class)
                         .getAll())
                         .withRel("servicios"));
     }

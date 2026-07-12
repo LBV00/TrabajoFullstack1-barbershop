@@ -1,5 +1,6 @@
 package com.barbershop.user_service.controller;
 
+import com.barbershop.user_service.assembler.UserModelAssembler;
 import com.barbershop.user_service.dto.UserDTO;
 import com.barbershop.user_service.exception.ApiErrorResponse;
 import com.barbershop.user_service.model.User;
@@ -17,63 +18,95 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.CollectionModel;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 import java.util.List;
 import java.util.stream.Collectors;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @SecurityRequirement(name = "bearerAuth")
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/users/v2")
 @Tag(name = "Usuarios", description = "Operaciones para administrar usuarios")
-public class UserController {
+public class UserControllerV2 {
 
    private final UserService userService;
-   
+   private final UserModelAssembler assembler;
 
 
-    public UserController(UserService userService) {
+    public UserControllerV2(UserService userService,
+        UserModelAssembler assembler) {
                 this.userService = userService;
-                
+                this.assembler = assembler;
         }
     @GetMapping
-    @Operation(summary = "(V1) Listar todos los usuarios")
+    @Operation(summary = "(V2) Listar todos los usuarios")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Lista de usuarios obtenida correctamente")
         })
-            public ResponseEntity<List<UserDTO>> getAll() {
-        List<UserDTO> lista = userService.findAll()
-                .stream()
-                .map(UserDTO::fromModel)
-                .toList();
-        return ResponseEntity.ok(lista);
-    }
+        public ResponseEntity<CollectionModel<EntityModel<UserDTO>>> getAll() {
+
+    List<EntityModel<UserDTO>> users = userService.findAll()
+            .stream()
+            .map(user -> EntityModel.of(
+                    UserDTO.fromModel(user),
+
+                    linkTo(methodOn(UserController.class)
+                            .getById(user.getId()))
+                            .withSelfRel()
+            ))
+            .toList();
+
+    CollectionModel<EntityModel<UserDTO>> collection =
+            CollectionModel.of(
+                    users,
+                    linkTo(methodOn(UserController.class)
+                            .getAll())
+                            .withSelfRel()
+            );
+
+    return ResponseEntity.ok(collection);
+        }
 
     @GetMapping("/{id}")
-    @Operation(summary = "(V1) Buscar usuario por ID")
+    @Operation(summary = "(V2) Buscar usuario por ID")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Usuario encontrado"),
         @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
         })
-            public ResponseEntity<UserDTO> getById(@PathVariable Long id) {
-        User model = userService.findById(id);
-        if (model == null) return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(UserDTO.fromModel(model));
-    }
+        public ResponseEntity<EntityModel<UserDTO>> getById(
+        @PathVariable Long id) {
 
-    @PostMapping
-    @Operation(summary = "Crear usuario")
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Usuario creado",
-                    content = @Content(schema = @Schema(implementation = UserDTO.class))),
-            @ApiResponse(responseCode = "400", description = "Datos inválidos",
-                    content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
-    })
+        User user = userService.findById(id);
+
+        if (user == null) {
+        return ResponseEntity.notFound().build();
+        }
+
+        EntityModel<UserDTO> model = EntityModel.of(
+            UserDTO.fromModel(user),
+
+            linkTo(methodOn(UserController.class)
+                    .getById(id))
+                    .withSelfRel(),
+
+            linkTo(methodOn(UserController.class)
+                    .getAll())
+                    .withRel("usuarios")
+    );
+
+        return ResponseEntity.ok(model);
+        }
+
+@PostMapping
     public ResponseEntity<UserDTO> create(@Valid @RequestBody UserDTO userDTO) {
         User savedUser = userService.save(userDTO.toModel());
         return ResponseEntity.status(HttpStatus.CREATED).body(UserDTO.fromModel(savedUser)); // 201
     }
 
-    @PutMapping("/{id}")
+
     @Operation(summary = "Actualizar usuario")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Usuario actualizado",
@@ -94,7 +127,7 @@ public class UserController {
         return ResponseEntity.notFound().build();
     }
 
-    @DeleteMapping("/{id}")
+
     @Operation(summary = "Eliminar usuario")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Usuario eliminado"),

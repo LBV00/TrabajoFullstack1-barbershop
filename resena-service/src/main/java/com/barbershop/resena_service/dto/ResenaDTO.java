@@ -37,4 +37,14 @@ public class ResenaDTO {
     @Schema(description = "Comentario de la reseña", example = "Excelente servicio")
     @NotBlank(message = "El comentario no puede estar vacío")
     private String comentario;
+
+    public static ResenaDTO fromModel(com.barbershop.resena_service.model.Resena model) {
+        return ResenaDTO.builder()
+                .id(model.getId())
+                .idUsuario(model.getIdUsuario())
+                .idReserva(model.getIdReserva())
+                .calificacion(model.getCalificacion())
+                .comentario(model.getComentario())
+                .build();
+    }
 }

@@ -13,6 +13,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import com.barbershop.producto_service.assembler.ProductoModelAssembler;
+
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.CollectionModel;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
@@ -23,37 +29,43 @@ import java.util.List;
 import java.util.stream.Collectors;
 @SecurityRequirement(name = "bearerAuth")
 @RestController
-@RequestMapping("/productos")
+@RequestMapping("/productos/v2")
 @Tag(name = "Productos", description = "Operaciones para administrar productos")
-public class ProductoController {
+public class ProductoControllerV2 {
 
     private final ProductoService productoService;
-    
+    private final ProductoModelAssembler assembler;
 
-    public ProductoController(
-        ProductoService productoService) {
+    public ProductoControllerV2(
+        ProductoService productoService,
+        ProductoModelAssembler assembler) {
 
     this.productoService = productoService;
-    
+    this.assembler = assembler;
   }
 
     @GetMapping
-    @Operation(summary = "(V1) Listar productos")
-        public ResponseEntity<List<ProductoDTO>> getAll() {
-        List<ProductoDTO> lista = productoService.findAll()
-                .stream()
-                .map(ProductoDTO::fromModel)
-                .toList();
-        return ResponseEntity.ok(lista);
+    @Operation(summary = "(V2) Listar productos")
+    public ResponseEntity<CollectionModel<EntityModel<ProductoDTO>>> getAll() {
+
+    List<EntityModel<ProductoDTO>> productos =
+            productoService.findAll()
+                    .stream()
+                    .map(assembler::toModel)
+                    .toList();
+
+     CollectionModel<EntityModel<ProductoDTO>> collection =
+            CollectionModel.of(
+                    productos,
+                    linkTo(methodOn(ProductoController.class)
+                            .getAll())
+                            .withSelfRel()
+            );
+
+     return ResponseEntity.ok(collection);
     }
 
-    @PostMapping
-    @Operation(summary = "Crear producto")
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Producto creado",
-                    content = @Content(schema = @Schema(implementation = ProductoDTO.class))),
-            @ApiResponse(responseCode = "400", description = "Datos inválidos")
-    })
+@PostMapping
     public ResponseEntity<ProductoDTO> create(
             @Valid @RequestBody ProductoDTO productoDTO) {
 
@@ -77,14 +89,22 @@ public class ProductoController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "(V1) Buscar producto por ID")
-    public ResponseEntity<ProductoDTO> obtenerPorId(@PathVariable Long id) {
-        Producto model = productoService.buscarPorId(id);
-        if (model == null) return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(ProductoDTO.fromModel(model));
+    @Operation(summary = "(V2) Buscar producto por ID")
+public ResponseEntity<EntityModel<ProductoDTO>> obtenerPorId(
+        @PathVariable Long id) {
+
+    Producto producto = productoService.buscarPorId(id);
+
+    if (producto == null) {
+        return ResponseEntity.notFound().build();
     }
 
-    @PutMapping("/{id}")
+    return ResponseEntity.ok(
+            assembler.toModel(producto)
+    );
+}
+
+
     @Operation(summary = "Actualizar producto")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Producto actualizado"),
@@ -114,7 +134,7 @@ public class ProductoController {
         return ResponseEntity.notFound().build();
     }
 
-    @DeleteMapping("/{id}")
+
     @Operation(summary = "Eliminar producto")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Producto eliminado"),

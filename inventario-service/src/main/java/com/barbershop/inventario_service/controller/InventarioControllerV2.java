@@ -13,6 +13,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import com.barbershop.inventario_service.assembler.InventarioModelAssembler;
+
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.CollectionModel;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 import jakarta.validation.Valid;
 
 import org.slf4j.Logger;
@@ -26,45 +32,58 @@ import java.util.List;
 import java.util.stream.Collectors;
 @SecurityRequirement(name = "bearerAuth")
 @RestController
-@RequestMapping("/inventarios")
+@RequestMapping("/inventarios/v2")
 @Tag(name = "Inventario", description = "Operaciones para administrar inventario")
-public class InventarioController {
+public class InventarioControllerV2 {
 
     private static final Logger logger =
-            LoggerFactory.getLogger(InventarioController.class);
+            LoggerFactory.getLogger(InventarioControllerV2.class);
 
     private final InventarioService inventarioService;
-    
-    public InventarioController(
-        InventarioService inventarioService) {
+    private final InventarioModelAssembler assembler;
+    public InventarioControllerV2(
+        InventarioService inventarioService,
+        InventarioModelAssembler assembler) {
      this.inventarioService = inventarioService;
-     
+     this.assembler = assembler;
      }
 
     @GetMapping
-    @Operation(summary = "(V1) Listar inventario")
-         public ResponseEntity<List<InventarioDTO>> getAll() {
-        List<InventarioDTO> lista = inventarioService.findAll()
-                .stream()
-                .map(InventarioDTO::fromModel)
-                .toList();
-        return ResponseEntity.ok(lista);
-    }
+    @Operation(summary = "(V2) Listar inventario")
+     public ResponseEntity<CollectionModel<EntityModel<InventarioDTO>>> getAll() {
+    logger.info("Obteniendo inventario");
+    List<EntityModel<InventarioDTO>> inventarios =
+            inventarioService.findAll()
+                    .stream()
+                    .map(assembler::toModel)
+                    .toList();
+
+    CollectionModel<EntityModel<InventarioDTO>> collection =
+            CollectionModel.of(
+                    inventarios,
+                    linkTo(methodOn(InventarioController.class)
+                            .getAll())
+                            .withSelfRel()
+            );
+
+    return ResponseEntity.ok(collection);
+     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "(V1) Buscar inventario por ID")
-        public ResponseEntity<InventarioDTO> getById(@PathVariable Long id) {
-        Inventario model = inventarioService.findById(id);
-        if (model == null) return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(InventarioDTO.fromModel(model));
+    @Operation(summary = "(V2) Buscar inventario por ID")
+    public ResponseEntity<EntityModel<InventarioDTO>> getById(
+        @PathVariable Long id) {
+    Inventario inventario =
+            inventarioService.findById(id);
+    if (inventario == null) {
+        return ResponseEntity.notFound().build();
+    }
+    return ResponseEntity.ok(
+            assembler.toModel(inventario)
+    );
     } 
 
-    @PostMapping
-    @Operation(summary = "Crear registro de inventario")
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Inventario creado"),
-            @ApiResponse(responseCode = "400", description = "Datos inválidos")
-    })
+@PostMapping
     public ResponseEntity<InventarioDTO> create(
             @Valid @RequestBody InventarioDTO inventarioDTO) {
 
@@ -76,7 +95,7 @@ public class InventarioController {
                 .body(InventarioDTO.fromModel(savedInventario));
     }
 
-    @PutMapping("/{id}")
+
     @Operation(summary = "Actualizar inventario")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Inventario actualizado"),
@@ -102,7 +121,7 @@ public class InventarioController {
         return ResponseEntity.notFound().build();
     }
 
-    @DeleteMapping("/{id}")
+
     @Operation(summary = "Eliminar inventario")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Inventario eliminado"),

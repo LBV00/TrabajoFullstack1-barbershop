@@ -13,6 +13,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import com.barbershop.sucursal_service.assembler.SucursalModelAssembler;
+
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.CollectionModel;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,50 +31,57 @@ import java.util.List;
 import java.util.stream.Collectors;
 @SecurityRequirement(name = "bearerAuth")
 @RestController
-@RequestMapping("/sucursales")
+@RequestMapping("/sucursales/v2")
 @Tag(name = "Sucursales", description = "Operaciones para administrar sucursales")
-public class SucursalController {
+public class SucursalControllerV2 {
 
     private static final Logger logger =
-            LoggerFactory.getLogger(SucursalController.class);
+            LoggerFactory.getLogger(SucursalControllerV2.class);
 
     private final SucursalService sucursalService;
-    
-    public SucursalController(
-        SucursalService sucursalService) {
+    private final SucursalModelAssembler assembler;
+    public SucursalControllerV2(
+        SucursalService sucursalService,
+        SucursalModelAssembler assembler) {
 
     this.sucursalService = sucursalService;
-    
+    this.assembler = assembler;
    }
     @GetMapping
-    @Operation(summary = "(V1) Listar sucursales")
-      public ResponseEntity<List<SucursalDTO>> getAll() {
-        List<SucursalDTO> lista = sucursalService.findAll()
-                .stream()
-                .map(SucursalDTO::fromModel)
-                .toList();
-        return ResponseEntity.ok(lista);
-    }
+    @Operation(summary = "(V2) Listar sucursales")
+  public ResponseEntity<CollectionModel<EntityModel<SucursalDTO>>> getAll() {
+    List<EntityModel<SucursalDTO>> sucursales =
+            sucursalService.findAll()
+                    .stream()
+                    .map(assembler::toModel)
+                    .toList();
+    CollectionModel<EntityModel<SucursalDTO>> collection =
+            CollectionModel.of(
+                    sucursales,
+                    linkTo(methodOn(SucursalController.class)
+                            .getAll())
+                            .withSelfRel()
+            );
+    return ResponseEntity.ok(collection);
+  }
 
     @GetMapping("/{id}")
-    @Operation(summary = "(V1) Buscar sucursal por ID")
+    @Operation(summary = "(V2) Buscar sucursal por ID")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Sucursal encontrada"),
         @ApiResponse(responseCode = "404", description = "Sucursal no encontrada")
      })
-        public ResponseEntity<SucursalDTO> getById(@PathVariable Long id) {
-        Sucursal model = sucursalService.findById(id);
-        if (model == null) return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(SucursalDTO.fromModel(model));
-    }
+    public ResponseEntity<EntityModel<SucursalDTO>> getById(
+        @PathVariable Long id) {
 
-    @PostMapping
-    @Operation(summary = "Crear sucursal")
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Sucursal creada",
-                    content = @Content(schema = @Schema(implementation = SucursalDTO.class))),
-            @ApiResponse(responseCode = "400", description = "Datos inválidos", content = @Content)
-    })
+    return ResponseEntity.ok(
+            assembler.toModel(
+                    sucursalService.findById(id)
+            )
+      );
+     }
+
+@PostMapping
     public ResponseEntity<SucursalDTO> create(@RequestBody SucursalDTO sucursalDTO) {
 
         logger.info("Creando sucursal {}", sucursalDTO.getNombre());
@@ -80,7 +93,7 @@ public class SucursalController {
                 .body(SucursalDTO.fromModel(savedSucursal));
     }
 
-    @PutMapping("/{id}")
+
     @Operation(summary = "Actualizar sucursal")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Sucursal actualizada",
@@ -106,7 +119,7 @@ public class SucursalController {
         return ResponseEntity.notFound().build();
     }
 
-    @DeleteMapping("/{id}")
+
     @Operation(summary = "Eliminar sucursal")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Sucursal eliminada"),

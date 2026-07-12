@@ -1,6 +1,6 @@
 package com.barbershop.user_service.assembler;
 
-import com.barbershop.user_service.controller.UserController;
+import com.barbershop.user_service.controller.UserControllerV2;
 import com.barbershop.user_service.model.User;
 
 import org.springframework.hateoas.EntityModel;
@@ -18,11 +18,11 @@ public class UserModelAssembler
 
         return EntityModel.of(user,
 
-                linkTo(methodOn(UserController.class)
+                linkTo(methodOn(UserControllerV2.class)
                         .getById(user.getId()))
                         .withSelfRel(),
 
-                linkTo(methodOn(UserController.class)
+                linkTo(methodOn(UserControllerV2.class)
                         .getAll())
                         .withRel("usuarios"));
     }

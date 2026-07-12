@@ -3,6 +3,12 @@ package com.barbershop.servicio_service.controller;
 import com.barbershop.servicio_service.dto.ServicioDTO;
 import com.barbershop.servicio_service.model.Servicio;
 import com.barbershop.servicio_service.service.ServicioService;
+import com.barbershop.servicio_service.assembler.ServicioModelAssembler;
+
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.CollectionModel;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -27,48 +33,56 @@ import java.util.List;
 import java.util.stream.Collectors;
 @SecurityRequirement(name = "bearerAuth")
 @RestController
-@RequestMapping("/servicios")
+@RequestMapping("/servicios/v2")
 @Tag(name = "Servicios", description = "Operaciones para administrar servicios")
-public class ServicioController {
+public class ServicioControllerV2 {
 
     private static final Logger logger =
-            LoggerFactory.getLogger(ServicioController.class);
+            LoggerFactory.getLogger(ServicioControllerV2.class);
 
     private final ServicioService servicioService;
-    
+    private final ServicioModelAssembler assembler;
 
-    public ServicioController(
-        ServicioService servicioService) {
+    public ServicioControllerV2(
+        ServicioService servicioService,
+        ServicioModelAssembler assembler) {
 
     this.servicioService = servicioService;
-    
+    this.assembler = assembler;
     }
 
     @GetMapping
-    @Operation(summary = "(V1) Listar servicios")
-            public ResponseEntity<List<ServicioDTO>> getAll() {
-        List<ServicioDTO> lista = servicioService.findAll()
-                .stream()
-                .map(ServicioDTO::fromModel)
-                .toList();
-        return ResponseEntity.ok(lista);
+    @Operation(summary = "(V2) Listar servicios")
+        public ResponseEntity<CollectionModel<EntityModel<ServicioDTO>>> getAll() {
+    List<EntityModel<ServicioDTO>> servicios =
+            servicioService.findAll()
+                    .stream()
+                    .map(assembler::toModel)
+                    .toList();
+    CollectionModel<EntityModel<ServicioDTO>> collection =
+            CollectionModel.of(
+                    servicios,
+                    linkTo(methodOn(ServicioController.class)
+                            .getAll())
+                            .withSelfRel()
+            );
+        return ResponseEntity.ok(collection);
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "(V1) Buscar servicio por ID")
-            public ResponseEntity<ServicioDTO> getById(@PathVariable Long id) {
-        Servicio model = servicioService.findById(id);
-        if (model == null) return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(ServicioDTO.fromModel(model));
-    } 
+    @Operation(summary = "(V2) Buscar servicio por ID")
+        public ResponseEntity<EntityModel<ServicioDTO>> getById(
+        @PathVariable Long id) {
+    Servicio servicio = servicioService.findById(id);
+    if (servicio == null) {
+        return ResponseEntity.notFound().build();
+    }
+    return ResponseEntity.ok(
+            assembler.toModel(servicio)
+    );
+   } 
 
-    @PostMapping
-    @Operation(summary = "Crear servicio")
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Servicio creado",
-                    content = @Content(schema = @Schema(implementation = ServicioDTO.class))),
-            @ApiResponse(responseCode = "400", description = "Datos inválidos", content = @Content)
-    })
+@PostMapping
     public ResponseEntity<ServicioDTO> create(
             @Valid @RequestBody ServicioDTO servicioDTO) {
 
@@ -82,7 +96,7 @@ public class ServicioController {
                 .body(ServicioDTO.fromModel(savedServicio));
     }
 
-    @PutMapping("/{id}")
+
     @Operation(summary = "Actualizar servicio")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Servicio actualizado",
@@ -111,7 +125,7 @@ public class ServicioController {
         return ResponseEntity.notFound().build();
     }
 
-    @DeleteMapping("/{id}")
+
     @Operation(summary = "Eliminar servicio")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Servicio eliminado"),

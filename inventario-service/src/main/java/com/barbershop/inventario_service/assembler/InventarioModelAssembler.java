@@ -1,6 +1,6 @@
 package com.barbershop.inventario_service.assembler;
 
-import com.barbershop.inventario_service.controller.InventarioController;
+import com.barbershop.inventario_service.controller.InventarioControllerV2;
 import com.barbershop.inventario_service.dto.InventarioDTO;
 import com.barbershop.inventario_service.model.Inventario;
 
@@ -21,11 +21,11 @@ public class InventarioModelAssembler
 
         return EntityModel.of(dto,
 
-                linkTo(methodOn(InventarioController.class)
+                linkTo(methodOn(InventarioControllerV2.class)
                         .getById(inventario.getId()))
                         .withSelfRel(),
 
-                linkTo(methodOn(InventarioController.class)
+                linkTo(methodOn(InventarioControllerV2.class)
                         .getAll())
                         .withRel("inventarios"));
     }

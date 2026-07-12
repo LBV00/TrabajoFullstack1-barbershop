@@ -85,7 +85,7 @@ class ServicioServiceTest {
 
     @Test
     void debeEliminarServicio() {
-
+        when(repository.existsById(1L)).thenReturn(true);
         servicioService.delete(1L);
 
         verify(repository, times(1))

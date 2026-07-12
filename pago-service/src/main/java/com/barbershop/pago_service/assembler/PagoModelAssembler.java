@@ -1,6 +1,6 @@
 package com.barbershop.pago_service.assembler;
 
-import com.barbershop.pago_service.controller.PagoController;
+import com.barbershop.pago_service.controller.PagoControllerV2;
 import com.barbershop.pago_service.dto.PagoDTO;
 import com.barbershop.pago_service.model.Pago;
 
@@ -21,11 +21,11 @@ public class PagoModelAssembler
 
         return EntityModel.of(dto,
 
-                linkTo(methodOn(PagoController.class)
+                linkTo(methodOn(PagoControllerV2.class)
                         .buscarPago(pago.getId()))
                         .withSelfRel(),
 
-                linkTo(methodOn(PagoController.class)
+                linkTo(methodOn(PagoControllerV2.class)
                         .listarPagos())
                         .withRel("pagos"));
     }

@@ -13,6 +13,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import com.barbershop.notificacion_service.assembler.NotificacionModelAssembler;
+
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.CollectionModel;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 import jakarta.validation.Valid;
 
 import org.slf4j.Logger;
@@ -26,46 +32,54 @@ import java.util.List;
 import java.util.stream.Collectors;
 @SecurityRequirement(name = "bearerAuth")
 @RestController
-@RequestMapping("/notificaciones")
+@RequestMapping("/notificaciones/v2")
 @Tag(name = "Notificaciones", description = "Operaciones para administrar notificaciones")
-public class NotificacionController {
+public class NotificacionControllerV2 {
 
     private static final Logger logger =
-            LoggerFactory.getLogger(NotificacionController.class);
+            LoggerFactory.getLogger(NotificacionControllerV2.class);
 
     private final NotificacionService notificacionService;
-    
-    public NotificacionController(
-        NotificacionService notificacionService) {
+    private final NotificacionModelAssembler assembler;
+    public NotificacionControllerV2(
+        NotificacionService notificacionService,
+        NotificacionModelAssembler assembler) {
 
     this.notificacionService = notificacionService;
-    
+    this.assembler = assembler;
     }
 
     @GetMapping
-    @Operation(summary = "(V1) Listar notificaciones")
-        public ResponseEntity<List<NotificacionDTO>> getAll() {
-        List<NotificacionDTO> lista = notificacionService.findAll()
-                .stream()
-                .map(NotificacionDTO::fromModel)
-                .toList();
-        return ResponseEntity.ok(lista);
-    }
+    @Operation(summary = "(V2) Listar notificaciones")
+    public ResponseEntity<CollectionModel<EntityModel<NotificacionDTO>>> getAll() {
+    List<EntityModel<NotificacionDTO>> notificaciones =
+            notificacionService.findAll()
+                    .stream()
+                    .map(assembler::toModel)
+                    .toList();
+    CollectionModel<EntityModel<NotificacionDTO>> collection =
+            CollectionModel.of(
+                    notificaciones,
+                    linkTo(methodOn(NotificacionController.class)
+                            .getAll())
+                            .withSelfRel()
+            );
+    return ResponseEntity.ok(collection);
+   }
 
     @GetMapping("/{id}")
-    @Operation(summary = "(V1) Buscar notificación por ID")
-        public ResponseEntity<NotificacionDTO> getById(@PathVariable Long id) {
-        Notificacion model = notificacionService.findById(id);
-        if (model == null) return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(NotificacionDTO.fromModel(model));
+    @Operation(summary = "(V2) Buscar notificación por ID")
+    public ResponseEntity<EntityModel<NotificacionDTO>> getById(
+        @PathVariable Long id) {Notificacion notificacion = notificacionService.findById(id);
+    if (notificacion == null) {
+        return ResponseEntity.notFound().build();
+    }
+    return ResponseEntity.ok(
+            assembler.toModel(notificacion)
+    );
     }
 
-    @PostMapping
-    @Operation(summary = "Crear notificación")
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Notificación creada"),
-            @ApiResponse(responseCode = "400", description = "Datos inválidos")
-    })
+@PostMapping
     public ResponseEntity<NotificacionDTO> create(
             @Valid @RequestBody NotificacionDTO dto) {
 
@@ -76,7 +90,7 @@ public class NotificacionController {
                 .body(NotificacionDTO.fromModel(saved));
     }
 
-    @PutMapping("/{id}")
+
     @Operation(summary = "Actualizar notificación")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Notificación actualizada"),
@@ -101,7 +115,7 @@ public class NotificacionController {
         return ResponseEntity.notFound().build();
     }
 
-    @DeleteMapping("/{id}")
+
     @Operation(summary = "Eliminar notificación")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Notificación eliminada"),

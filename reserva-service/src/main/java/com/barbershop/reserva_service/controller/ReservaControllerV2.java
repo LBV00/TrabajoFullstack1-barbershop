@@ -26,14 +26,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 @SecurityRequirement(name = "bearerAuth")
 @RestController
-@RequestMapping("/reservas")
+@RequestMapping("/reservas/v2")
 @Tag(name = "Reservas", description = "Operaciones para administrar reservas")
-public class ReservaController {
+public class ReservaControllerV2 {
 
     private final ReservaService reservaService;
     private final ReservaModelAssembler assembler;
 
-    public ReservaController(
+    public ReservaControllerV2(
         ReservaService reservaService,
         ReservaModelAssembler assembler) {
 
@@ -42,23 +42,32 @@ public class ReservaController {
     }
 
     @GetMapping
-    @Operation(summary = "Listar reservas")
-    public ResponseEntity<List<ReservaDTO>> getAll() {
-        List<ReservaDTO> reservas =
-                reservaService.findAll()
-                        .stream()
-                        .map(this::toDTO)
-                        .toList();
-        return ResponseEntity.ok(reservas);
-    }
+    @Operation(summary = "(V2) Listar reservas")
+    public ResponseEntity<CollectionModel<EntityModel<ReservaDTO>>> getAll() {
+    List<EntityModel<ReservaDTO>> reservas =
+            reservaService.findAll()
+                    .stream()
+                    .map(assembler::toModel)
+                    .toList();
+    CollectionModel<EntityModel<ReservaDTO>> collection =
+            CollectionModel.of(
+                    reservas,
+                    linkTo(methodOn(ReservaController.class)
+                            .getAll())
+                            .withSelfRel()
+            );
+    return ResponseEntity.ok(collection);
+   }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Buscar reserva por ID")
-    public ResponseEntity<ReservaDTO> getById(@PathVariable Long id) {
-        java.util.Optional<Reserva> model = reservaService.findById(id);
-        if (model.isEmpty()) return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(toDTO(model.get()));
-    }
+    @Operation(summary = "(V2) Buscar reserva por ID")
+        public ResponseEntity<EntityModel<ReservaDTO>> getById(
+        @PathVariable Long id) {
+    return reservaService.findById(id)
+            .map(assembler::toModel)
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
+        }
 
     @GetMapping("/cliente/{idUsuario}")
     @Operation(summary = "Buscar reservas por usuario")
@@ -89,13 +98,7 @@ public class ReservaController {
         return ResponseEntity.ok(reservaService.contarTotalReservas());
     }
 
-    @PostMapping
-    @Operation(summary = "Crear reserva")
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Reserva creada",
-                    content = @Content(schema = @Schema(implementation = ReservaDTO.class))),
-            @ApiResponse(responseCode = "400", description = "Datos inválidos", content = @Content)
-    })
+@PostMapping
     public ResponseEntity<?> create(@Valid @RequestBody ReservaDTO dto) {
 
         try {
@@ -109,7 +112,7 @@ public class ReservaController {
         }
     }
 
-    @PutMapping("/{id}")
+
     @Operation(summary = "Actualizar reserva")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Reserva actualizada",
@@ -140,7 +143,7 @@ public class ReservaController {
         }
     }
 
-    @DeleteMapping("/{id}")
+
     @Operation(summary = "Eliminar reserva")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Reserva eliminada"),

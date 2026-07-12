@@ -1,6 +1,6 @@
 package com.barbershop.resena_service.assembler;
 
-import com.barbershop.resena_service.controller.ResenaController;
+import com.barbershop.resena_service.controller.ResenaControllerV2;
 import com.barbershop.resena_service.dto.ResenaDTO;
 import com.barbershop.resena_service.model.Resena;
 
@@ -27,11 +27,11 @@ public class ResenaModelAssembler
 
         return EntityModel.of(dto,
 
-                linkTo(methodOn(ResenaController.class)
+                linkTo(methodOn(ResenaControllerV2.class)
                         .getById(resena.getId()))
                         .withSelfRel(),
 
-                linkTo(methodOn(ResenaController.class)
+                linkTo(methodOn(ResenaControllerV2.class)
                         .getAll())
                         .withRel("resenas"));
     }

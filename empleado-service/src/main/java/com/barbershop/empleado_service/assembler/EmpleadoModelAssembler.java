@@ -1,6 +1,6 @@
 package com.barbershop.empleado_service.assembler;
 
-import com.barbershop.empleado_service.controller.EmpleadoController;
+import com.barbershop.empleado_service.controller.EmpleadoControllerV2;
 import com.barbershop.empleado_service.dto.EmpleadoDTO;
 import com.barbershop.empleado_service.model.Empleado;
 
@@ -21,11 +21,11 @@ public class EmpleadoModelAssembler
 
         return EntityModel.of(dto,
 
-                linkTo(methodOn(EmpleadoController.class)
+                linkTo(methodOn(EmpleadoControllerV2.class)
                         .getById(empleado.getId()))
                         .withSelfRel(),
 
-                linkTo(methodOn(EmpleadoController.class)
+                linkTo(methodOn(EmpleadoControllerV2.class)
                         .getAll())
                         .withRel("empleados"));
     }

@@ -89,7 +89,7 @@ class SucursalServiceTest {
 
     @Test
     void debeEliminarSucursal() {
-
+        when(sucursalRepository.existsById(1L)).thenReturn(true);
         sucursalService.delete(1L);
 
         verify(sucursalRepository, times(1))
