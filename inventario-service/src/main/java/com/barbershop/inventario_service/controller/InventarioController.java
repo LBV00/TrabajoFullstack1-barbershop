@@ -13,12 +13,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import com.barbershop.inventario_service.assembler.InventarioModelAssembler;
-
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.CollectionModel;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 import jakarta.validation.Valid;
 
 import org.slf4j.Logger;
@@ -40,47 +34,29 @@ public class InventarioController {
             LoggerFactory.getLogger(InventarioController.class);
 
     private final InventarioService inventarioService;
-    private final InventarioModelAssembler assembler;
+    
     public InventarioController(
-        InventarioService inventarioService,
-        InventarioModelAssembler assembler) {
+        InventarioService inventarioService) {
      this.inventarioService = inventarioService;
-     this.assembler = assembler;
+     
      }
 
     @GetMapping
-    @Operation(summary = "Listar inventario")
-     public ResponseEntity<CollectionModel<EntityModel<InventarioDTO>>> getAll() {
-    logger.info("Obteniendo inventario");
-    List<EntityModel<InventarioDTO>> inventarios =
-            inventarioService.findAll()
-                    .stream()
-                    .map(assembler::toModel)
-                    .toList();
-
-    CollectionModel<EntityModel<InventarioDTO>> collection =
-            CollectionModel.of(
-                    inventarios,
-                    linkTo(methodOn(InventarioController.class)
-                            .getAll())
-                            .withSelfRel()
-            );
-
-    return ResponseEntity.ok(collection);
-     }
+    @Operation(summary = "(V1) Listar inventario")
+         public ResponseEntity<List<InventarioDTO>> getAll() {
+        List<InventarioDTO> lista = inventarioService.findAll()
+                .stream()
+                .map(InventarioDTO::fromModel)
+                .toList();
+        return ResponseEntity.ok(lista);
+    }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Buscar inventario por ID")
-    public ResponseEntity<EntityModel<InventarioDTO>> getById(
-        @PathVariable Long id) {
-    Inventario inventario =
-            inventarioService.findById(id);
-    if (inventario == null) {
-        return ResponseEntity.notFound().build();
-    }
-    return ResponseEntity.ok(
-            assembler.toModel(inventario)
-    );
+    @Operation(summary = "(V1) Buscar inventario por ID")
+        public ResponseEntity<InventarioDTO> getById(@PathVariable Long id) {
+        Inventario model = inventarioService.findById(id);
+        if (model == null) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(InventarioDTO.fromModel(model));
     } 
 
     @PostMapping

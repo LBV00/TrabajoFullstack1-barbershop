@@ -85,7 +85,7 @@ class EmpleadoServiceTest {
 
     @Test
     void debeEliminarEmpleado() {
-
+        when(repository.existsById(1L)).thenReturn(true);
         empleadoService.delete(1L);
 
         verify(repository, times(1))

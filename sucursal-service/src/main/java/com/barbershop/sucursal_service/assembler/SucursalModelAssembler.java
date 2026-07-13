@@ -1,6 +1,6 @@
 package com.barbershop.sucursal_service.assembler;
 
-import com.barbershop.sucursal_service.controller.SucursalController;
+import com.barbershop.sucursal_service.controller.SucursalControllerV2;
 import com.barbershop.sucursal_service.dto.SucursalDTO;
 import com.barbershop.sucursal_service.model.Sucursal;
 
@@ -21,11 +21,11 @@ public class SucursalModelAssembler
 
         return EntityModel.of(dto,
 
-                linkTo(methodOn(SucursalController.class)
+                linkTo(methodOn(SucursalControllerV2.class)
                         .getById(sucursal.getId()))
                         .withSelfRel(),
 
-                linkTo(methodOn(SucursalController.class)
+                linkTo(methodOn(SucursalControllerV2.class)
                         .getAll())
                         .withRel("sucursales"));
     }

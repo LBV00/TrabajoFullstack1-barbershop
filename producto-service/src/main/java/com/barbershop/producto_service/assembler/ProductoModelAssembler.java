@@ -1,6 +1,6 @@
 package com.barbershop.producto_service.assembler;
 
-import com.barbershop.producto_service.controller.ProductoController;
+import com.barbershop.producto_service.controller.ProductoControllerV2;
 import com.barbershop.producto_service.dto.ProductoDTO;
 import com.barbershop.producto_service.model.Producto;
 
@@ -21,11 +21,11 @@ public class ProductoModelAssembler
 
         return EntityModel.of(dto,
 
-                linkTo(methodOn(ProductoController.class)
+                linkTo(methodOn(ProductoControllerV2.class)
                         .obtenerPorId(producto.getId()))
                         .withSelfRel(),
 
-                linkTo(methodOn(ProductoController.class)
+                linkTo(methodOn(ProductoControllerV2.class)
                         .getAll())
                         .withRel("productos"));
     }

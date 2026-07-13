@@ -43,31 +43,22 @@ public class ReservaController {
 
     @GetMapping
     @Operation(summary = "Listar reservas")
-    public ResponseEntity<CollectionModel<EntityModel<ReservaDTO>>> getAll() {
-    List<EntityModel<ReservaDTO>> reservas =
-            reservaService.findAll()
-                    .stream()
-                    .map(assembler::toModel)
-                    .toList();
-    CollectionModel<EntityModel<ReservaDTO>> collection =
-            CollectionModel.of(
-                    reservas,
-                    linkTo(methodOn(ReservaController.class)
-                            .getAll())
-                            .withSelfRel()
-            );
-    return ResponseEntity.ok(collection);
-   }
+    public ResponseEntity<List<ReservaDTO>> getAll() {
+        List<ReservaDTO> reservas =
+                reservaService.findAll()
+                        .stream()
+                        .map(this::toDTO)
+                        .toList();
+        return ResponseEntity.ok(reservas);
+    }
 
     @GetMapping("/{id}")
     @Operation(summary = "Buscar reserva por ID")
-        public ResponseEntity<EntityModel<ReservaDTO>> getById(
-        @PathVariable Long id) {
-    return reservaService.findById(id)
-            .map(assembler::toModel)
-            .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.notFound().build());
-        }
+    public ResponseEntity<ReservaDTO> getById(@PathVariable Long id) {
+        java.util.Optional<Reserva> model = reservaService.findById(id);
+        if (model.isEmpty()) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(toDTO(model.get()));
+    }
 
     @GetMapping("/cliente/{idUsuario}")
     @Operation(summary = "Buscar reservas por usuario")

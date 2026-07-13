@@ -90,6 +90,9 @@ class InventarioServiceTest {
     @Test
     void debeEliminarInventario() {
 
+        when(repository.existsById(1L))
+                .thenReturn(true);
+
         inventarioService.delete(1L);
 
         verify(repository, times(1))

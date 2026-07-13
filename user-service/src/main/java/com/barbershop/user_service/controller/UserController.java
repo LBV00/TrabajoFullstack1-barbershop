@@ -1,6 +1,5 @@
 package com.barbershop.user_service.controller;
 
-import com.barbershop.user_service.assembler.UserModelAssembler;
 import com.barbershop.user_service.dto.UserDTO;
 import com.barbershop.user_service.exception.ApiErrorResponse;
 import com.barbershop.user_service.model.User;
@@ -18,10 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.CollectionModel;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 import java.util.List;
 import java.util.stream.Collectors;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -33,72 +28,37 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 public class UserController {
 
    private final UserService userService;
-   private final UserModelAssembler assembler;
+   
 
 
-    public UserController(UserService userService,
-        UserModelAssembler assembler) {
+    public UserController(UserService userService) {
                 this.userService = userService;
-                this.assembler = assembler;
+                
         }
     @GetMapping
-    @Operation(summary = "Listar todos los usuarios")
+    @Operation(summary = "(V1) Listar todos los usuarios")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Lista de usuarios obtenida correctamente")
         })
-        public ResponseEntity<CollectionModel<EntityModel<UserDTO>>> getAll() {
-
-    List<EntityModel<UserDTO>> users = userService.findAll()
-            .stream()
-            .map(user -> EntityModel.of(
-                    UserDTO.fromModel(user),
-
-                    linkTo(methodOn(UserController.class)
-                            .getById(user.getId()))
-                            .withSelfRel()
-            ))
-            .toList();
-
-    CollectionModel<EntityModel<UserDTO>> collection =
-            CollectionModel.of(
-                    users,
-                    linkTo(methodOn(UserController.class)
-                            .getAll())
-                            .withSelfRel()
-            );
-
-    return ResponseEntity.ok(collection);
-        }
+            public ResponseEntity<List<UserDTO>> getAll() {
+        List<UserDTO> lista = userService.findAll()
+                .stream()
+                .map(UserDTO::fromModel)
+                .toList();
+        return ResponseEntity.ok(lista);
+    }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Buscar usuario por ID")
+    @Operation(summary = "(V1) Buscar usuario por ID")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Usuario encontrado"),
         @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
         })
-        public ResponseEntity<EntityModel<UserDTO>> getById(
-        @PathVariable Long id) {
-
-        User user = userService.findById(id);
-
-        if (user == null) {
-        return ResponseEntity.notFound().build();
-        }
-
-        EntityModel<UserDTO> model = EntityModel.of(
-            UserDTO.fromModel(user),
-
-            linkTo(methodOn(UserController.class)
-                    .getById(id))
-                    .withSelfRel(),
-
-            linkTo(methodOn(UserController.class)
-                    .getAll())
-                    .withRel("usuarios")
-    );
-
-        return ResponseEntity.ok(model);
-        }
+            public ResponseEntity<UserDTO> getById(@PathVariable Long id) {
+        User model = userService.findById(id);
+        if (model == null) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(UserDTO.fromModel(model));
+    }
 
     @PostMapping
     @Operation(summary = "Crear usuario")

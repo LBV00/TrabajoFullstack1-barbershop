@@ -11,4 +11,5 @@ import org.springframework.stereotype.Repository;
 public interface PagoRepository extends JpaRepository<Pago, Long> {
     List<Pago> findByIdUsuario(Long idUsuario); 
 
+    boolean existsByIdReserva(Long idReserva);
 }

@@ -5,85 +5,54 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
-
+/**
+ * Filtro global del Gateway que propaga el usuario autenticado a los microservicios.
+ *
+ * La validación JWT ya fue realizada por Spring Security (SecurityConfig).
+ * Este filtro únicamente extrae el username del SecurityContext y lo reenvía
+ * como header "X-Authenticated-User" para que los microservicios puedan
+ * identificar al usuario sin necesidad de re-validar el token.
+ *
+ * Flujo:
+ *   [Request] → SecurityWebFilterChain (valida JWT) → JwtAuthFilter (agrega header) → Microservicio
+ */
 @Component
 public class JwtAuthFilter implements GlobalFilter, Ordered {
 
     private static final Logger log = LoggerFactory.getLogger(JwtAuthFilter.class);
-    private final JwtUtil jwtUtil;
-
-    private static final List<String> PUBLIC_PATHS = List.of(
-            "/auth/login",
-            "/auth/validar"
-    );
-
-    public JwtAuthFilter(JwtUtil jwtUtil) {
-        this.jwtUtil = jwtUtil;
-    }
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        return ReactiveSecurityContextHolder.getContext()
+                .map(SecurityContext::getAuthentication)
+                .filter(auth -> auth != null && auth.isAuthenticated())
+                .map(Authentication::getPrincipal)
+                .map(Object::toString)
+                .flatMap(username -> {
+                    log.debug("Propagando usuario autenticado '{}' → {}",
+                            username, exchange.getRequest().getURI().getPath());
 
-        String path = exchange.getRequest().getURI().getPath();
+                    ServerHttpRequest mutated = exchange.getRequest()
+                            .mutate()
+                            .header("X-Authenticated-User", username)
+                            .build();
 
-        boolean esPublica = PUBLIC_PATHS.stream().anyMatch(path::startsWith);
-
-        boolean esInterna = path.endsWith("/exists");
-
-        boolean esSwagger =
-                path.contains("/swagger-ui")
-                        || path.contains("/v3/api-docs")
-                        || path.equals("/swagger-ui.html")
-                        || path.contains("/webjars");
-
-        if (esPublica || esInterna || esSwagger) {
-            log.debug("Acceso libre: {}", path);
-            return chain.filter(exchange);
-        }
-
-        String authHeader = exchange.getRequest()
-                .getHeaders()
-                .getFirst("Authorization");
-
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            log.warn("Acceso denegado — sin token en: {}", path);
-            exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-            return exchange.getResponse().setComplete();
-        }
-
-        String token = authHeader.substring(7);
-
-        if (!jwtUtil.validateToken(token)) {
-            log.warn("Acceso denegado — token inválido en: {}", path);
-            exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-            return exchange.getResponse().setComplete();
-        }
-
-        String username = jwtUtil.getUsernameFromToken(token);
-
-        log.info("Acceso autorizado — usuario: {} → {}", username, path);
-
-        ServerHttpRequest mutated = exchange.getRequest()
-                .mutate()
-                .header("X-Authenticated-User", username)
-                .build();
-
-        return chain.filter(
-                exchange.mutate()
-                        .request(mutated)
-                        .build()
-        );
+                    return chain.filter(exchange.mutate().request(mutated).build());
+                })
+                .switchIfEmpty(chain.filter(exchange));
     }
 
     @Override
     public int getOrder() {
-        return -1;
+        // Ejecutar después de que Spring Security (orden -100) haya procesado la auth
+        return 0;
     }
 }

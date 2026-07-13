@@ -13,12 +13,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import com.barbershop.producto_service.assembler.ProductoModelAssembler;
-
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.CollectionModel;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
@@ -34,35 +28,23 @@ import java.util.stream.Collectors;
 public class ProductoController {
 
     private final ProductoService productoService;
-    private final ProductoModelAssembler assembler;
+    
 
     public ProductoController(
-        ProductoService productoService,
-        ProductoModelAssembler assembler) {
+        ProductoService productoService) {
 
     this.productoService = productoService;
-    this.assembler = assembler;
+    
   }
 
     @GetMapping
-    @Operation(summary = "Listar productos")
-    public ResponseEntity<CollectionModel<EntityModel<ProductoDTO>>> getAll() {
-
-    List<EntityModel<ProductoDTO>> productos =
-            productoService.findAll()
-                    .stream()
-                    .map(assembler::toModel)
-                    .toList();
-
-     CollectionModel<EntityModel<ProductoDTO>> collection =
-            CollectionModel.of(
-                    productos,
-                    linkTo(methodOn(ProductoController.class)
-                            .getAll())
-                            .withSelfRel()
-            );
-
-     return ResponseEntity.ok(collection);
+    @Operation(summary = "(V1) Listar productos")
+        public ResponseEntity<List<ProductoDTO>> getAll() {
+        List<ProductoDTO> lista = productoService.findAll()
+                .stream()
+                .map(ProductoDTO::fromModel)
+                .toList();
+        return ResponseEntity.ok(lista);
     }
 
     @PostMapping
@@ -95,20 +77,12 @@ public class ProductoController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Buscar producto por ID")
-public ResponseEntity<EntityModel<ProductoDTO>> obtenerPorId(
-        @PathVariable Long id) {
-
-    Producto producto = productoService.buscarPorId(id);
-
-    if (producto == null) {
-        return ResponseEntity.notFound().build();
+    @Operation(summary = "(V1) Buscar producto por ID")
+    public ResponseEntity<ProductoDTO> obtenerPorId(@PathVariable Long id) {
+        Producto model = productoService.buscarPorId(id);
+        if (model == null) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(ProductoDTO.fromModel(model));
     }
-
-    return ResponseEntity.ok(
-            assembler.toModel(producto)
-    );
-}
 
     @PutMapping("/{id}")
     @Operation(summary = "Actualizar producto")

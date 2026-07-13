@@ -43,13 +43,18 @@ Cada microservicio tiene su **propia base de datos MySQL** independiente. La com
 
 | Servicio | Puerto | Base de datos | Descripción |
 |----------|--------|---------------|-------------|
-| api-gateway | 7090 | — | Enrutamiento y validación JWT |
+| api-gateway | 7090 | — | Enrutamiento centralizado y validación JWT |
 | auth-service | 7096 | db_barbershop_auth | Login y generación de tokens JWT |
-| user-service | 7091 | db_barbershop_users | Gestión de clientes |
+| user-service | 7091 | db_barbershop_users | Gestión de clientes/usuarios |
 | reserva-service | 7092 | db_barbershop_reservas | Agendamiento de horas (2 tablas relacionadas) |
-| producto-service | 7093 | db_barbershop_productos | Catálogo y stock |
+| producto-service | 7093 | db_barbershop_productos | Catálogo y stock de productos |
 | pago-service | 7094 | db_barbershop_pagos | Registro de transacciones |
 | resena-service | 7095 | db_barbershop_resenas | Calificaciones y feedback |
+| empleado-service | 7097 | db_barbershop_empleados | Gestión del personal de la barbería |
+| inventario-service | 7098 | db_barbershop_inventario | Control de stock e inventario interno |
+| notificacion-service | 7099 | db_barbershop_notificaciones | Envío y seguimiento de notificaciones |
+| servicio-service | 7100 | db_barbershop_servicios | Catálogo de servicios ofrecidos |
+| sucursal-service | 7101 | db_barbershop_sucursales | Administración de sucursales |
 
 ### Comunicación entre servicios
 
@@ -258,6 +263,145 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9...
 
 ---
 
+### 👨‍💼 empleado-service — `/empleados`
+
+Gestiona el personal de la barbería (barberos, recepcionistas, gerentes).
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `/empleados` | Listar todos los empleados |
+| GET | `/empleados/{id}` | Buscar empleado por ID |
+| POST | `/empleados` | Crear empleado |
+| PUT | `/empleados/{id}` | Actualizar empleado |
+| DELETE | `/empleados/{id}` | Eliminar empleado |
+| GET | `/empleados/{id}/exists` | Verificar existencia (uso interno) |
+| GET | `/empleados/v2` | Listar empleados con HATEOAS |
+| GET | `/empleados/v2/{id}` | Buscar empleado por ID con HATEOAS |
+
+**Body POST/PUT:**
+```json
+{
+  "nombre": "Carlos",
+  "apellido": "Gutierrez",
+  "cargo": "BARBERO",
+  "telefono": "+56987654321",
+  "email": "carlos@barbershop.com"
+}
+```
+
+---
+
+### 📦 inventario-service — `/inventarios`
+
+Controla el stock interno de insumos y productos en bodega.
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `/inventarios` | Listar todos los registros de inventario |
+| GET | `/inventarios/{id}` | Buscar registro por ID |
+| POST | `/inventarios` | Crear registro de inventario |
+| PUT | `/inventarios/{id}` | Actualizar registro |
+| DELETE | `/inventarios/{id}` | Eliminar registro |
+| GET | `/inventarios/{id}/exists` | Verificar existencia (uso interno) |
+| GET | `/inventarios/v2` | Listar con HATEOAS |
+| GET | `/inventarios/v2/{id}` | Buscar por ID con HATEOAS |
+
+**Body POST/PUT:**
+```json
+{
+  "nombreProducto": "Aceite para barba",
+  "cantidad": 50,
+  "unidad": "unidades",
+  "stockMinimo": 10
+}
+```
+
+---
+
+### 🔔 notificacion-service — `/notificaciones`
+
+Gestiona el envío y seguimiento de notificaciones a clientes (confirmaciones de reserva, recordatorios, etc.).
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `/notificaciones` | Listar todas las notificaciones |
+| GET | `/notificaciones/{id}` | Buscar notificación por ID |
+| POST | `/notificaciones` | Crear notificación |
+| PUT | `/notificaciones/{id}` | Actualizar notificación |
+| DELETE | `/notificaciones/{id}` | Eliminar notificación |
+| GET | `/notificaciones/{id}/exists` | Verificar existencia (uso interno) |
+| GET | `/notificaciones/v2` | Listar con HATEOAS |
+| GET | `/notificaciones/v2/{id}` | Buscar por ID con HATEOAS |
+
+**Body POST/PUT:**
+```json
+{
+  "destinatario": "cliente@email.com",
+  "mensaje": "Su reserva del 15/07 a las 15:30 fue confirmada.",
+  "estado": "PENDIENTE"
+}
+```
+
+> Los estados posibles son: `PENDIENTE`, `ENVIADA`, `ERROR`.
+
+---
+
+### ✂️ servicio-service — `/servicios`
+
+Administra el catálogo de servicios ofrecidos por la barbería (corte, afeitado, tratamientos, etc.).
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `/servicios` | Listar todos los servicios |
+| GET | `/servicios/{id}` | Buscar servicio por ID |
+| POST | `/servicios` | Crear servicio |
+| PUT | `/servicios/{id}` | Actualizar servicio |
+| DELETE | `/servicios/{id}` | Eliminar servicio |
+| GET | `/servicios/{id}/exists` | Verificar existencia (uso interno) |
+| GET | `/servicios/v2` | Listar con HATEOAS |
+| GET | `/servicios/v2/{id}` | Buscar por ID con HATEOAS |
+
+**Body POST/PUT:**
+```json
+{
+  "nombre": "Corte clásico",
+  "descripcion": "Corte de cabello con tijera y máquina",
+  "precio": 12000.0,
+  "duracionMinutos": 30
+}
+```
+
+---
+
+### 🏪 sucursal-service — `/sucursales`
+
+Administra las sucursales físicas de la cadena de barberías.
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `/sucursales` | Listar todas las sucursales |
+| GET | `/sucursales/{id}` | Buscar sucursal por ID |
+| POST | `/sucursales` | Crear sucursal |
+| PUT | `/sucursales/{id}` | Actualizar sucursal |
+| DELETE | `/sucursales/{id}` | Eliminar sucursal |
+| GET | `/sucursales/{id}/exists` | Verificar existencia (uso interno) |
+| GET | `/sucursales/v2` | Listar con HATEOAS |
+| GET | `/sucursales/v2/{id}` | Buscar por ID con HATEOAS |
+| PUT | `/sucursales/v2/{id}` | Actualizar con HATEOAS |
+| DELETE | `/sucursales/v2/{id}` | Eliminar con HATEOAS |
+
+**Body POST/PUT:**
+```json
+{
+  "nombre": "Sucursal Centro",
+  "direccion": "Av. O'Higgins 1234",
+  "ciudad": "Santiago",
+  "telefono": "+5622345678"
+}
+```
+
+---
+
 ## 🗄️ Modelo de datos
 
 ### reserva-service (2 tablas relacionadas)
@@ -281,18 +425,21 @@ detalle_reservas
 
 ## ✅ Funcionalidades implementadas
 
-- [x] 6 microservicios independientes con base de datos propia
+- [x] 12 microservicios independientes con base de datos propia
 - [x] Patrón CSR (Controller / Service / Repository) en todos los servicios
 - [x] CRUD completo en todos los microservicios
 - [x] Liquibase en todos los servicios con datos iniciales (10+ registros)
 - [x] Relación @OneToMany / @ManyToOne en reserva-service
-- [x] Validaciones Bean Validation con DTOs separados de entidades
+- [x] Validaciones Bean Validation (JSR 380) con @Valid en DTOs
 - [x] Comunicación entre microservicios con WebClient
-- [x] Manejo de excepciones con @RestControllerAdvice en todos los servicios
+- [x] Manejo global de excepciones con @RestControllerAdvice en todos los servicios
 - [x] Logging estructurado con SLF4J
-- [x] Endpoints adicionales: búsqueda por atributo, totales
+- [x] Endpoints adicionales: búsqueda por atributo, totales, exists
+- [x] API V2 con HATEOAS (EntityModel / CollectionModel) en todos los servicios
 - [x] API Gateway con enrutamiento centralizado
 - [x] Autenticación JWT (bono)
+- [x] Documentación OpenAPI/Swagger en todos los microservicios
+- [x] Pruebas unitarias con JUnit 5 + Mockito en todos los servicios
 
 ---
 

@@ -13,12 +13,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import com.barbershop.empleado_service.assembler.EmpleadoModelAssembler;
-
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.CollectionModel;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 import jakarta.validation.Valid;
 
 import org.slf4j.Logger;
@@ -40,52 +34,30 @@ public class EmpleadoController {
             LoggerFactory.getLogger(EmpleadoController.class);
 
     private final EmpleadoService empleadoService;
-    private final EmpleadoModelAssembler assembler;
+    
     public EmpleadoController(
-        EmpleadoService empleadoService,
-        EmpleadoModelAssembler assembler) {
+        EmpleadoService empleadoService) {
 
     this.empleadoService = empleadoService;
-    this.assembler = assembler;
+    
    }
 
     @GetMapping
-    @Operation(summary = "Listar empleados")
-     public ResponseEntity<CollectionModel<EntityModel<EmpleadoDTO>>> getAll() {
-
-    logger.info("Obteniendo empleados");
-
-    List<EntityModel<EmpleadoDTO>> empleados =
-            empleadoService.findAll()
-                    .stream()
-                    .map(assembler::toModel)
-                    .toList();
-
-    CollectionModel<EntityModel<EmpleadoDTO>> collection =
-            CollectionModel.of(
-                    empleados,
-                    linkTo(methodOn(EmpleadoController.class)
-                            .getAll())
-                            .withSelfRel()
-            );
-
-    return ResponseEntity.ok(collection);
-       }  
+    @Operation(summary = "(V1) Listar empleados")
+         public ResponseEntity<List<EmpleadoDTO>> getAll() {
+        List<EmpleadoDTO> lista = empleadoService.findAll()
+                .stream()
+                .map(EmpleadoDTO::fromModel)
+                .toList();
+        return ResponseEntity.ok(lista);
+    }  
 
     @GetMapping("/{id}")
-    @Operation(summary = "Buscar empleado por ID")
-     public ResponseEntity<EntityModel<EmpleadoDTO>> getById(
-        @PathVariable Long id) {
-
-    Empleado empleado = empleadoService.findById(id);
-
-    if (empleado == null) {
-        return ResponseEntity.notFound().build();
-    }
-
-    return ResponseEntity.ok(
-            assembler.toModel(empleado)
-    );
+    @Operation(summary = "(V1) Buscar empleado por ID")
+         public ResponseEntity<EmpleadoDTO> getById(@PathVariable Long id) {
+        Empleado model = empleadoService.findById(id);
+        if (model == null) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(EmpleadoDTO.fromModel(model));
     }
 
     @PostMapping

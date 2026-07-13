@@ -13,12 +13,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import com.barbershop.sucursal_service.assembler.SucursalModelAssembler;
-
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.CollectionModel;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,47 +34,34 @@ public class SucursalController {
             LoggerFactory.getLogger(SucursalController.class);
 
     private final SucursalService sucursalService;
-    private final SucursalModelAssembler assembler;
+    
     public SucursalController(
-        SucursalService sucursalService,
-        SucursalModelAssembler assembler) {
+        SucursalService sucursalService) {
 
     this.sucursalService = sucursalService;
-    this.assembler = assembler;
+    
    }
     @GetMapping
-    @Operation(summary = "Listar sucursales")
-  public ResponseEntity<CollectionModel<EntityModel<SucursalDTO>>> getAll() {
-    List<EntityModel<SucursalDTO>> sucursales =
-            sucursalService.findAll()
-                    .stream()
-                    .map(assembler::toModel)
-                    .toList();
-    CollectionModel<EntityModel<SucursalDTO>> collection =
-            CollectionModel.of(
-                    sucursales,
-                    linkTo(methodOn(SucursalController.class)
-                            .getAll())
-                            .withSelfRel()
-            );
-    return ResponseEntity.ok(collection);
-  }
+    @Operation(summary = "(V1) Listar sucursales")
+      public ResponseEntity<List<SucursalDTO>> getAll() {
+        List<SucursalDTO> lista = sucursalService.findAll()
+                .stream()
+                .map(SucursalDTO::fromModel)
+                .toList();
+        return ResponseEntity.ok(lista);
+    }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Buscar sucursal por ID")
+    @Operation(summary = "(V1) Buscar sucursal por ID")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Sucursal encontrada"),
         @ApiResponse(responseCode = "404", description = "Sucursal no encontrada")
      })
-    public ResponseEntity<EntityModel<SucursalDTO>> getById(
-        @PathVariable Long id) {
-
-    return ResponseEntity.ok(
-            assembler.toModel(
-                    sucursalService.findById(id)
-            )
-      );
-     }
+        public ResponseEntity<SucursalDTO> getById(@PathVariable Long id) {
+        Sucursal model = sucursalService.findById(id);
+        if (model == null) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(SucursalDTO.fromModel(model));
+    }
 
     @PostMapping
     @Operation(summary = "Crear sucursal")
@@ -88,7 +70,7 @@ public class SucursalController {
                     content = @Content(schema = @Schema(implementation = SucursalDTO.class))),
             @ApiResponse(responseCode = "400", description = "Datos inválidos", content = @Content)
     })
-    public ResponseEntity<SucursalDTO> create(@RequestBody SucursalDTO sucursalDTO) {
+    public ResponseEntity<SucursalDTO> create(@Valid @RequestBody SucursalDTO sucursalDTO) {
 
         logger.info("Creando sucursal {}", sucursalDTO.getNombre());
 
@@ -109,7 +91,7 @@ public class SucursalController {
     public ResponseEntity<SucursalDTO> update(
             @Parameter(description = "ID de la sucursal", example = "1", required = true)
             @PathVariable Long id,
-            @RequestBody SucursalDTO sucursalDTO) {
+            @Valid @RequestBody SucursalDTO sucursalDTO) {
 
         if (sucursalService.findById(id) != null) {
 

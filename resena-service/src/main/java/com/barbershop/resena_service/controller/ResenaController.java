@@ -13,12 +13,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import com.barbershop.resena_service.assembler.ResenaModelAssembler;
-
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.CollectionModel;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
@@ -34,63 +28,30 @@ import java.util.Optional;
 public class ResenaController {
 
     private final ResenaService resenaService;
-    private final ResenaModelAssembler assembler;
+    
 
     public ResenaController(
-        ResenaService resenaService,
-        ResenaModelAssembler assembler) {
+        ResenaService resenaService) {
      this.resenaService = resenaService;
-     this.assembler = assembler;
+     
     }
 
     @GetMapping
-    @Operation(summary = "Listar reseñas")
-    public ResponseEntity<CollectionModel<EntityModel<ResenaDTO>>> getAll() {
-
-    List<EntityModel<ResenaDTO>> resenas =
-            resenaService.findAll()
-                    .stream()
-                    .map(assembler::toModel)
-                    .toList();
-
-    CollectionModel<EntityModel<ResenaDTO>> collection =
-            CollectionModel.of(
-                    resenas,
-                    linkTo(methodOn(ResenaController.class)
-                            .getAll())
-                            .withSelfRel()
-            );
-    return ResponseEntity.ok(collection);
-     }
+    @Operation(summary = "(V1) Listar reseñas")
+        public ResponseEntity<List<ResenaDTO>> getAll() {
+        List<ResenaDTO> lista = resenaService.findAll()
+                .stream()
+                .map(ResenaDTO::fromModel)
+                .toList();
+        return ResponseEntity.ok(lista);
+    }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Buscar reseña por ID")
-    public ResponseEntity<EntityModel<ResenaDTO>> getById(
-        @PathVariable Long id) {
-
-    return resenaService.findById(id)
-            .map(assembler::toModel)
-            .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.notFound().build());
-       }
-
-    @GetMapping("/usuario/{idUsuario}")
-    @Operation(summary = "Buscar reseñas por usuario")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Reseñas encontradas"),
-            @ApiResponse(responseCode = "204", description = "No existen reseñas para el usuario")
-    })
-    public ResponseEntity<List<Resena>> getByIdUsuario(
-            @Parameter(description = "ID del usuario", example = "1", required = true)
-            @PathVariable Long idUsuario) {
-
-        List<Resena> resenas = resenaService.findByIdUsuario(idUsuario);
-
-        if (resenas.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-
-        return ResponseEntity.ok(resenas);
+    @Operation(summary = "(V1) Buscar reseña por ID")
+        public ResponseEntity<ResenaDTO> getById(@PathVariable Long id) {
+        Optional<Resena> model = resenaService.findById(id);
+        if (model.isEmpty()) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(ResenaDTO.fromModel(model.get()));
     }
 
     @GetMapping("/total")

@@ -3,12 +3,6 @@ package com.barbershop.servicio_service.controller;
 import com.barbershop.servicio_service.dto.ServicioDTO;
 import com.barbershop.servicio_service.model.Servicio;
 import com.barbershop.servicio_service.service.ServicioService;
-import com.barbershop.servicio_service.assembler.ServicioModelAssembler;
-
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.CollectionModel;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -41,46 +35,32 @@ public class ServicioController {
             LoggerFactory.getLogger(ServicioController.class);
 
     private final ServicioService servicioService;
-    private final ServicioModelAssembler assembler;
+    
 
     public ServicioController(
-        ServicioService servicioService,
-        ServicioModelAssembler assembler) {
+        ServicioService servicioService) {
 
     this.servicioService = servicioService;
-    this.assembler = assembler;
+    
     }
 
     @GetMapping
-    @Operation(summary = "Listar servicios")
-        public ResponseEntity<CollectionModel<EntityModel<ServicioDTO>>> getAll() {
-    List<EntityModel<ServicioDTO>> servicios =
-            servicioService.findAll()
-                    .stream()
-                    .map(assembler::toModel)
-                    .toList();
-    CollectionModel<EntityModel<ServicioDTO>> collection =
-            CollectionModel.of(
-                    servicios,
-                    linkTo(methodOn(ServicioController.class)
-                            .getAll())
-                            .withSelfRel()
-            );
-        return ResponseEntity.ok(collection);
+    @Operation(summary = "(V1) Listar servicios")
+            public ResponseEntity<List<ServicioDTO>> getAll() {
+        List<ServicioDTO> lista = servicioService.findAll()
+                .stream()
+                .map(ServicioDTO::fromModel)
+                .toList();
+        return ResponseEntity.ok(lista);
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Buscar servicio por ID")
-        public ResponseEntity<EntityModel<ServicioDTO>> getById(
-        @PathVariable Long id) {
-    Servicio servicio = servicioService.findById(id);
-    if (servicio == null) {
-        return ResponseEntity.notFound().build();
-    }
-    return ResponseEntity.ok(
-            assembler.toModel(servicio)
-    );
-   } 
+    @Operation(summary = "(V1) Buscar servicio por ID")
+            public ResponseEntity<ServicioDTO> getById(@PathVariable Long id) {
+        Servicio model = servicioService.findById(id);
+        if (model == null) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(ServicioDTO.fromModel(model));
+    } 
 
     @PostMapping
     @Operation(summary = "Crear servicio")

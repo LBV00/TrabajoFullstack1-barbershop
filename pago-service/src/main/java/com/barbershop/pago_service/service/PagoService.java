@@ -1,5 +1,6 @@
 package com.barbershop.pago_service.service;
 
+import com.barbershop.pago_service.exception.BadRequestException;
 import com.barbershop.pago_service.exception.ResourceNotFoundException;
 import com.barbershop.pago_service.model.Pago;
 import com.barbershop.pago_service.repository.PagoRepository;
@@ -64,6 +65,24 @@ public class PagoService {
         }
 
         
+        if (pago.getMonto() == null || pago.getMonto() <= 0) {
+            log.error("Fallo en la validación: El monto debe ser mayor a 0.");
+            throw new BadRequestException("El monto del pago debe ser mayor a 0");
+        }
+
+        if (pago.getMetodoPago() == null || 
+            (!pago.getMetodoPago().equalsIgnoreCase("TARJETA") && 
+             !pago.getMetodoPago().equalsIgnoreCase("EFECTIVO") && 
+             !pago.getMetodoPago().equalsIgnoreCase("TRANSFERENCIA"))) {
+            log.error("Fallo en la validación: Método de pago no válido.");
+            throw new BadRequestException("Método de pago no válido");
+        }
+
+        if (pagoRepository.existsByIdReserva(pago.getIdReserva())) {
+            log.error("Fallo en la validación: La reserva con ID {} ya ha sido pagada.", pago.getIdReserva());
+            throw new BadRequestException("La reserva ya ha sido pagada previamente");
+        }
+
         log.info("Validaciones exitosas. Procesando el pago en la base de datos.");
 
         
