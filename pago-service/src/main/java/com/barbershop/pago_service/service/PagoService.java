@@ -4,8 +4,8 @@ import com.barbershop.pago_service.exception.BadRequestException;
 import com.barbershop.pago_service.exception.ResourceNotFoundException;
 import com.barbershop.pago_service.model.Pago;
 import com.barbershop.pago_service.repository.PagoRepository;
-import org.slf4j.Logger; // <-- AGREGADO
-import org.slf4j.LoggerFactory; // <-- AGREGADO
+import org.slf4j.Logger; 
+import org.slf4j.LoggerFactory; 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

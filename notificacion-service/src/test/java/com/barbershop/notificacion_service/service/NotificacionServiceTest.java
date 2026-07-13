@@ -18,10 +18,6 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-/**
- * Pruebas unitarias aisladas para NotificacionService.
- * No usa base de datos; el repositorio se simula con Mockito.
- */
 @ExtendWith(MockitoExtension.class)
 class NotificacionServiceTest {
 

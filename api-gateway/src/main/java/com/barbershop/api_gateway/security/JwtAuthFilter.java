@@ -13,17 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-/**
- * Filtro global del Gateway que propaga el usuario autenticado a los microservicios.
- *
- * La validación JWT ya fue realizada por Spring Security (SecurityConfig).
- * Este filtro únicamente extrae el username del SecurityContext y lo reenvía
- * como header "X-Authenticated-User" para que los microservicios puedan
- * identificar al usuario sin necesidad de re-validar el token.
- *
- * Flujo:
- *   [Request] → SecurityWebFilterChain (valida JWT) → JwtAuthFilter (agrega header) → Microservicio
- */
+
 @Component
 public class JwtAuthFilter implements GlobalFilter, Ordered {
 

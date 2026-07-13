@@ -43,14 +43,7 @@ public class EmpleadoService {
                 });
     }
 
-    /**
-     * Regla de negocio 1: Al guardar un empleado nuevo (sin ID), se establece
-     *   {@code disponible = true} automáticamente si no fue especificado.
-     * Regla de negocio 2: La especialidad se normaliza a mayúsculas para
-     *   mantener consistencia en los datos.
-     * Regla de negocio 3: No se permite dar de alta un empleado marcado
-     *   explícitamente como NO disponible (disponible = false).
-     */
+  
     public Empleado save(Empleado empleado) {
 
         // R1: Valor por defecto para disponible en nuevos empleados

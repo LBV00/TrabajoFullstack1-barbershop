@@ -19,7 +19,7 @@ public class InventarioService {
     private static final Logger logger =
             LoggerFactory.getLogger(InventarioService.class);
 
-    /** Umbral a partir del cual se emite una alerta de stock bajo. */
+    
     private static final int STOCK_MINIMO_ALERTA = 5;
 
     @Autowired
@@ -46,15 +46,7 @@ public class InventarioService {
                 });
     }
 
-    /**
-     * Regla de negocio 1: El stock no puede ser negativo.
-     *   Si se intenta guardar stock < 0 se lanza BadRequestException.
-     * Regla de negocio 2: Si el stock resultante es menor o igual a
-     *   {@value #STOCK_MINIMO_ALERTA} unidades, se registra una advertencia
-     *   en el log para que el sistema de alertas pueda detectarla.
-     * Regla de negocio 3: La ubicacion se normaliza eliminando espacios
-     *   sobrantes y convirtiendo a mayusculas.
-     */
+   
     public Inventario save(Inventario inventario) {
 
         // R1: Stock no puede ser negativo

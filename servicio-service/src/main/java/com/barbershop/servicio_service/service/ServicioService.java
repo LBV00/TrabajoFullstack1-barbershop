@@ -42,14 +42,7 @@ public class ServicioService {
                 });
     }
 
-    /**
-     * Regla de negocio 1: El precio debe ser mayor a cero.
-     *   Un servicio con precio 0 o negativo no tiene sentido de negocio.
-     * Regla de negocio 2: La duracion (en minutos) debe ser mayor a cero.
-     *   Un servicio sin duracion minima no puede ser agendado.
-     * Regla de negocio 3: El nombre del servicio se normaliza (trim + primera
-     *   letra en mayuscula) para evitar duplicados por diferencia de formato.
-     */
+    
     public Servicio save(Servicio servicio) {
 
         // R1: Precio debe ser positivo

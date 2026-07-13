@@ -12,20 +12,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-/**
- * Manejador global de excepciones para auth-service.
- * Captura errores de validación, credenciales inválidas y errores generales,
- * retornando respuestas JSON coherentes con el formato ApiErrorResponse.
- */
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    /**
-     * Captura errores de validación Bean Validation (JSR 380 / @Valid).
-     * Devuelve 400 con el primer mensaje de error encontrado.
-     */
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiErrorResponse> handleValidation(
             MethodArgumentNotValidException ex,
@@ -41,11 +34,7 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.BAD_REQUEST, mensaje, request.getRequestURI());
     }
 
-    /**
-     * Captura errores de credenciales inválidas o usuario inactivo
-     * lanzados como RuntimeException desde AuthService.
-     * Devuelve 401 Unauthorized.
-     */
+  
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ApiErrorResponse> handleCredencialesInvalidas(
             RuntimeException ex,
@@ -63,10 +52,7 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.BAD_REQUEST, mensaje, request.getRequestURI());
     }
 
-    /**
-     * Captura cualquier excepción no controlada.
-     * Devuelve 500 Internal Server Error.
-     */
+  
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponse> handleGeneral(
             Exception ex,
@@ -80,7 +66,7 @@ public class GlobalExceptionHandler {
                 request.getRequestURI());
     }
 
-    // ── Helper ──────────────────────────────────────────────────────────────
+
 
     private ResponseEntity<ApiErrorResponse> buildResponse(
             HttpStatus status, String message, String path) {

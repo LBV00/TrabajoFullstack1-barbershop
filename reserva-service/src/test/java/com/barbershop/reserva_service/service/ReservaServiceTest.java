@@ -19,10 +19,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-/**
- * Pruebas unitarias aisladas para ReservaService.
- * No usa base de datos; el repositorio y WebClient se simulan con Mockito.
- */
+
 @ExtendWith(MockitoExtension.class)
 class ReservaServiceTest {
 

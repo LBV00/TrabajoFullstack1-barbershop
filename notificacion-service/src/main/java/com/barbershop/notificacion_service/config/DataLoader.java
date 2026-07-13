@@ -7,12 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * DataLoader — carga inicial complementaria al 30% de datos.
- * Liquibase cubre el 70% (5 notificaciones base).
- * Este DataLoader agrega el 30% restante (3 notificaciones adicionales)
- * sin duplicar los datos ya existentes.
- */
+
 @Configuration
 public class DataLoader implements CommandLineRunner {
 
