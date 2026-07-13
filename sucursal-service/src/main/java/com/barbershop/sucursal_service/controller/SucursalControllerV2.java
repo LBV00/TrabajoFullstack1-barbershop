@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -82,7 +83,7 @@ public class SucursalControllerV2 {
      }
 
 @PostMapping
-    public ResponseEntity<SucursalDTO> create(@RequestBody SucursalDTO sucursalDTO) {
+    public ResponseEntity<SucursalDTO> create(@Valid @RequestBody SucursalDTO sucursalDTO) {
 
         logger.info("Creando sucursal {}", sucursalDTO.getNombre());
 
@@ -94,6 +95,7 @@ public class SucursalControllerV2 {
     }
 
 
+    @PutMapping("/{id}")
     @Operation(summary = "Actualizar sucursal")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Sucursal actualizada",
@@ -103,7 +105,7 @@ public class SucursalControllerV2 {
     public ResponseEntity<SucursalDTO> update(
             @Parameter(description = "ID de la sucursal", example = "1", required = true)
             @PathVariable Long id,
-            @RequestBody SucursalDTO sucursalDTO) {
+            @Valid @RequestBody SucursalDTO sucursalDTO) {
 
         if (sucursalService.findById(id) != null) {
 
@@ -120,6 +122,7 @@ public class SucursalControllerV2 {
     }
 
 
+    @DeleteMapping("/{id}")
     @Operation(summary = "Eliminar sucursal")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Sucursal eliminada"),

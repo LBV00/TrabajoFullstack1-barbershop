@@ -1,5 +1,6 @@
 package com.barbershop.empleado_service.service;
 
+import com.barbershop.empleado_service.exception.BadRequestException;
 import com.barbershop.empleado_service.exception.ResourceNotFoundException;
 import com.barbershop.empleado_service.model.Empleado;
 import com.barbershop.empleado_service.repository.EmpleadoRepository;
@@ -42,9 +43,37 @@ public class EmpleadoService {
                 });
     }
 
+    /**
+     * Regla de negocio 1: Al guardar un empleado nuevo (sin ID), se establece
+     *   {@code disponible = true} automáticamente si no fue especificado.
+     * Regla de negocio 2: La especialidad se normaliza a mayúsculas para
+     *   mantener consistencia en los datos.
+     * Regla de negocio 3: No se permite dar de alta un empleado marcado
+     *   explícitamente como NO disponible (disponible = false).
+     */
     public Empleado save(Empleado empleado) {
 
-        logger.info("Guardando empleado");
+        // R1: Valor por defecto para disponible en nuevos empleados
+        if (empleado.getId() == null && empleado.getDisponible() == null) {
+            empleado.setDisponible(true);
+            logger.info("Empleado nuevo: disponibilidad establecida en true por defecto");
+        }
+
+        // R3: No se permite registrar un empleado marcado como no disponible
+        if (Boolean.FALSE.equals(empleado.getDisponible()) && empleado.getId() == null) {
+            logger.warn("Intento de crear empleado con disponible=false rechazado");
+            throw new BadRequestException(
+                    "No se puede registrar un empleado con disponibilidad en false. " +
+                    "Use el metodo de actualizacion para cambiar su estado.");
+        }
+
+        // R2: Normalizar especialidad a mayúsculas
+        if (empleado.getEspecialidad() != null) {
+            empleado.setEspecialidad(empleado.getEspecialidad().toUpperCase().trim());
+        }
+
+        logger.info("Guardando empleado: {} - especialidad: {} - disponible: {}",
+                empleado.getNombre(), empleado.getEspecialidad(), empleado.getDisponible());
 
         return repository.save(empleado);
     }

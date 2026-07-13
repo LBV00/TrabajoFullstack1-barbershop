@@ -1,5 +1,6 @@
 package com.barbershop.inventario_service.service;
 
+import com.barbershop.inventario_service.exception.BadRequestException;
 import com.barbershop.inventario_service.exception.ResourceNotFoundException;
 import com.barbershop.inventario_service.model.Inventario;
 import com.barbershop.inventario_service.repository.InventarioRepository;
@@ -17,6 +18,9 @@ public class InventarioService {
 
     private static final Logger logger =
             LoggerFactory.getLogger(InventarioService.class);
+
+    /** Umbral a partir del cual se emite una alerta de stock bajo. */
+    private static final int STOCK_MINIMO_ALERTA = 5;
 
     @Autowired
     private InventarioRepository repository;
@@ -42,9 +46,39 @@ public class InventarioService {
                 });
     }
 
+    /**
+     * Regla de negocio 1: El stock no puede ser negativo.
+     *   Si se intenta guardar stock < 0 se lanza BadRequestException.
+     * Regla de negocio 2: Si el stock resultante es menor o igual a
+     *   {@value #STOCK_MINIMO_ALERTA} unidades, se registra una advertencia
+     *   en el log para que el sistema de alertas pueda detectarla.
+     * Regla de negocio 3: La ubicacion se normaliza eliminando espacios
+     *   sobrantes y convirtiendo a mayusculas.
+     */
     public Inventario save(Inventario inventario) {
 
-        logger.info("Guardando inventario");
+        // R1: Stock no puede ser negativo
+        if (inventario.getStock() != null && inventario.getStock() < 0) {
+            logger.error("Intento de guardar stock negativo ({}) para productoId {}",
+                    inventario.getStock(), inventario.getProductoId());
+            throw new BadRequestException(
+                    "El stock no puede ser un valor negativo. Valor recibido: " +
+                    inventario.getStock());
+        }
+
+        // R2: Alerta de stock bajo
+        if (inventario.getStock() != null && inventario.getStock() <= STOCK_MINIMO_ALERTA) {
+            logger.warn("[ALERTA STOCK BAJO] ProductoId {} tiene solo {} unidades en inventario (umbral: {})",
+                    inventario.getProductoId(), inventario.getStock(), STOCK_MINIMO_ALERTA);
+        }
+
+        // R3: Normalizar ubicacion
+        if (inventario.getUbicacion() != null) {
+            inventario.setUbicacion(inventario.getUbicacion().toUpperCase().trim());
+        }
+
+        logger.info("Guardando inventario: productoId={}, stock={}, ubicacion={}",
+                inventario.getProductoId(), inventario.getStock(), inventario.getUbicacion());
 
         return repository.save(inventario);
     }

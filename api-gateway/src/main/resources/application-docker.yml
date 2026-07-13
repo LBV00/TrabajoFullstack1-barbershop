@@ -7,11 +7,11 @@ spring:
   cloud:
     gateway:
       routes:
-        # --- USER SERVICE ---
-        - id: user-service
-          uri: http://user-service:7091
-          predicates:
-            - Path=/users/**
+        # ==============================================
+        # RUTAS DE API-DOCS (deben ir ANTES que las rutas generales)
+        # ==============================================
+
+        # --- USER DOCS ---
         - id: user-docs
           uri: http://user-service:7091
           predicates:
@@ -19,11 +19,7 @@ spring:
           filters:
             - SetPath=/v3/api-docs
 
-        # --- RESERVA SERVICE ---
-        - id: reserva-service
-          uri: http://reserva-service:7092
-          predicates:
-            - Path=/reservas/**
+        # --- RESERVA DOCS ---
         - id: reserva-docs
           uri: http://reserva-service:7092
           predicates:
@@ -31,11 +27,7 @@ spring:
           filters:
             - SetPath=/v3/api-docs
 
-        # --- PRODUCTO SERVICE ---
-        - id: producto-service
-          uri: http://producto-service:7093
-          predicates:
-            - Path=/productos/**
+        # --- PRODUCTO DOCS ---
         - id: producto-docs
           uri: http://producto-service:7093
           predicates:
@@ -43,11 +35,7 @@ spring:
           filters:
             - SetPath=/v3/api-docs
 
-        # --- PAGO SERVICE ---
-        - id: pago-service
-          uri: http://pago-service:7094
-          predicates:
-            - Path=/pagos/**
+        # --- PAGO DOCS ---
         - id: pago-docs
           uri: http://pago-service:7094
           predicates:
@@ -55,11 +43,7 @@ spring:
           filters:
             - SetPath=/v3/api-docs
 
-        # --- RESENA SERVICE ---
-        - id: resena-service
-          uri: http://resena-service:7095
-          predicates:
-            - Path=/resenas/**
+        # --- RESENA DOCS ---
         - id: resena-docs
           uri: http://resena-service:7095
           predicates:
@@ -67,11 +51,7 @@ spring:
           filters:
             - SetPath=/v3/api-docs
 
-        # --- AUTH SERVICE ---
-        - id: auth-service
-          uri: http://auth-service:7096
-          predicates:
-            - Path=/auth/**
+        # --- AUTH DOCS ---
         - id: auth-docs
           uri: http://auth-service:7096
           predicates:
@@ -79,11 +59,7 @@ spring:
           filters:
             - SetPath=/v3/api-docs
 
-        # --- EMPLEADO SERVICE ---
-        - id: empleado-service
-          uri: http://empleado-service:7097
-          predicates:
-            - Path=/empleados/**
+        # --- EMPLEADO DOCS ---
         - id: empleado-docs
           uri: http://empleado-service:7097
           predicates:
@@ -91,11 +67,7 @@ spring:
           filters:
             - SetPath=/v3/api-docs
 
-        # --- INVENTARIO SERVICE ---
-        - id: inventario-service
-          uri: http://inventario-service:7098
-          predicates:
-            - Path=/inventarios/**
+        # --- INVENTARIO DOCS ---
         - id: inventario-docs
           uri: http://inventario-service:7098
           predicates:
@@ -103,11 +75,7 @@ spring:
           filters:
             - SetPath=/v3/api-docs
 
-        # --- NOTIFICACION SERVICE ---
-        - id: notificacion-service
-          uri: http://notificacion-service:7099
-          predicates:
-            - Path=/notificaciones/**
+        # --- NOTIFICACION DOCS ---
         - id: notificacion-docs
           uri: http://notificacion-service:7099
           predicates:
@@ -115,11 +83,7 @@ spring:
           filters:
             - SetPath=/v3/api-docs
 
-        # --- SERVICIO SERVICE ---
-        - id: servicio-service
-          uri: http://servicio-service:7100
-          predicates:
-            - Path=/servicios/**
+        # --- SERVICIO DOCS ---
         - id: servicio-docs
           uri: http://servicio-service:7100
           predicates:
@@ -127,11 +91,7 @@ spring:
           filters:
             - SetPath=/v3/api-docs
 
-        # --- SUCURSAL SERVICE ---
-        - id: sucursal-service
-          uri: http://sucursal-service:7101
-          predicates:
-            - Path=/sucursales/**
+        # --- SUCURSAL DOCS ---
         - id: sucursal-docs
           uri: http://sucursal-service:7101
           predicates:
@@ -139,12 +99,87 @@ spring:
           filters:
             - SetPath=/v3/api-docs
 
+        # ==============================================
+        # RUTAS GENERALES (deben ir DESPUÉS de los docs)
+        # ==============================================
+
+        # --- USER SERVICE ---
+        - id: user-service
+          uri: http://user-service:7091
+          predicates:
+            - Path=/users/**
+
+        # --- RESERVA SERVICE ---
+        - id: reserva-service
+          uri: http://reserva-service:7092
+          predicates:
+            - Path=/reservas/**
+
+        # --- PRODUCTO SERVICE ---
+        - id: producto-service
+          uri: http://producto-service:7093
+          predicates:
+            - Path=/productos/**
+
+        # --- PAGO SERVICE ---
+        - id: pago-service
+          uri: http://pago-service:7094
+          predicates:
+            - Path=/pagos/**
+
+        # --- RESENA SERVICE ---
+        - id: resena-service
+          uri: http://resena-service:7095
+          predicates:
+            - Path=/resenas/**
+
+        # --- AUTH SERVICE ---
+        - id: auth-service
+          uri: http://auth-service:7096
+          predicates:
+            - Path=/auth/**
+
+        # --- EMPLEADO SERVICE ---
+        - id: empleado-service
+          uri: http://empleado-service:7097
+          predicates:
+            - Path=/empleados/**
+
+        # --- INVENTARIO SERVICE ---
+        - id: inventario-service
+          uri: http://inventario-service:7098
+          predicates:
+            - Path=/inventarios/**
+
+        # --- NOTIFICACION SERVICE ---
+        - id: notificacion-service
+          uri: http://notificacion-service:7099
+          predicates:
+            - Path=/notificaciones/**
+
+        # --- SERVICIO SERVICE ---
+        - id: servicio-service
+          uri: http://servicio-service:7100
+          predicates:
+            - Path=/servicios/**
+
+        # --- SUCURSAL SERVICE ---
+        - id: sucursal-service
+          uri: http://sucursal-service:7101
+          predicates:
+            - Path=/sucursales/**
+
 jwt:
   secret: barbershop-secret-key-2025-fullstack-duoc-uc-muy-segura
 
 springdoc:
+  api-docs:
+    enabled: true
   swagger-ui:
+    enabled: true
     path: /swagger-ui.html
+    config-url: /v3/api-docs/swagger-config
+    disable-swagger-default-url: true
     urls:
       - name: Auth Service
         url: /auth/v3/api-docs

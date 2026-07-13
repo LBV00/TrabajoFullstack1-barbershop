@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -69,7 +70,7 @@ public class SucursalController {
                     content = @Content(schema = @Schema(implementation = SucursalDTO.class))),
             @ApiResponse(responseCode = "400", description = "Datos inválidos", content = @Content)
     })
-    public ResponseEntity<SucursalDTO> create(@RequestBody SucursalDTO sucursalDTO) {
+    public ResponseEntity<SucursalDTO> create(@Valid @RequestBody SucursalDTO sucursalDTO) {
 
         logger.info("Creando sucursal {}", sucursalDTO.getNombre());
 
@@ -90,7 +91,7 @@ public class SucursalController {
     public ResponseEntity<SucursalDTO> update(
             @Parameter(description = "ID de la sucursal", example = "1", required = true)
             @PathVariable Long id,
-            @RequestBody SucursalDTO sucursalDTO) {
+            @Valid @RequestBody SucursalDTO sucursalDTO) {
 
         if (sucursalService.findById(id) != null) {
 
